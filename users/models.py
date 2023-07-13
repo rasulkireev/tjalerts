@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from model_utils.models import TimeStampedModel
 
+from utils.models import BaseModel
+
 
 class CustomUser(AbstractUser):
     name = models.CharField(max_length=100, blank=True)
@@ -20,3 +22,7 @@ class Subscriber(TimeStampedModel):
     confirmed = models.BooleanField(default=False)
 
     technology_selected = models.CharField(max_length=256)
+
+
+class Alert(BaseModel):
+    subscriber = models.ForeignKey(Subscriber, on_delete=models.CASCADE)

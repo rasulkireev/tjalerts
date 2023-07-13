@@ -557,25 +557,6 @@ files = [
 graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
-name = "dj-stripe"
-version = "2.8.1"
-description = "Django + Stripe made easy"
-optional = false
-python-versions = ">=3.8.0,<4.0.0"
-files = [
-    {file = "dj_stripe-2.8.1-py3-none-any.whl", hash = "sha256:607635aacf0bb99b85a0de00ceb2f3bf1087f664477baeb87641b751a6c04724"},
-    {file = "dj_stripe-2.8.1.tar.gz", hash = "sha256:041f73eb9c5fbb0fd952dbd66e5fd2c8339ea34a159c27296aaf9253c8a88c77"},
-]
-
-[package.dependencies]
-django = ">=3.2"
-stripe = ">=2.48.0,<5.0.0"
-
-[package.extras]
-mysql = ["mysqlclient (>=1.4.0)"]
-postgres = ["psycopg2 (>=2.8.5,<3.0.0)"]
-
-[[package]]
 name = "django"
 version = "4.2.3"
 description = "A high-level Python web framework that encourages rapid development and clean, pragmatic design."
@@ -1819,20 +1800,6 @@ doc = ["sphinx"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
-name = "stripe"
-version = "4.2.0"
-description = "Python bindings for the Stripe API"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-files = [
-    {file = "stripe-4.2.0-py2.py3-none-any.whl", hash = "sha256:8ce03bfc099465740e33890000c454e79316c8730e45ad1efbaec3d52a019d05"},
-    {file = "stripe-4.2.0.tar.gz", hash = "sha256:f0134704bd4e9410fae25034836dc6f5849d92c0f9083d58d43e01b3e631ac4c"},
-]
-
-[package.dependencies]
-requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
-
-[[package]]
 name = "text-unidecode"
 version = "1.3"
 description = "The most basic Text::Unidecode port"
@@ -2134,4 +2101,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b4da90dbdb7081405941ff62ce429e93cba6a59e1521f9324e76801604a66155"
+content-hash = "af5aab88f2a14abce1a044d097f40dd8bd6f4379961f817d8f5df711fd3d3749"
