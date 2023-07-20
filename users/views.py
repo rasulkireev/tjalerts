@@ -70,5 +70,7 @@ class AlertUpdateView(SuccessMessageMixin, UpdateView):
     success_message = "Thanks for confirming :) You will receive your alerts soon!"
 
     def form_valid(self, form):
+        response = super(AlertUpdateView, self).form_valid(form)
         async_task(find_subs_to_alert)
-        return super(AlertUpdateView, self).form_valid(form)
+
+        return response
