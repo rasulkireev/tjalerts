@@ -216,10 +216,10 @@ OPENAI_KEY = env("OPENAI_KEY")
 
 ANYMAIL = {
     "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-    "MAILGUN_SENDER_DOMAIN": "mg.hn-jobs.com",
+    "MAILGUN_SENDER_DOMAIN": "mg.gettjalerts.com",
 }
-DEFAULT_FROM_EMAIL = "rasul@hn-jobs.com"
-SERVER_EMAIL = "error@hn-jobs.com"
+DEFAULT_FROM_EMAIL = "rasul@gettjalerts.com"
+SERVER_EMAIL = "error@gettjalerts.com"
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
