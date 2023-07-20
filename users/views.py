@@ -13,7 +13,7 @@ from hn_jobs.utils import add_users_context
 
 from .forms import CreateAlertForm, UpdateAlertForm
 from .models import CustomUser, Subscriber
-from .tasks import send_confirmation_email
+from .tasks import find_subs_to_alert, send_confirmation_email
 
 logger = logging.getLogger(__file__)
 
@@ -68,3 +68,7 @@ class AlertUpdateView(SuccessMessageMixin, UpdateView):
     template_name = "account/subscription-confirmation.html"
     success_url = reverse_lazy("home")
     success_message = "Thanks for confirming :) You will receive your alerts soon!"
+
+    def form_valid(self, form):
+        async_task(find_subs_to_alert)
+        return super(AlertUpdateView, self).form_valid(form)
