@@ -6,6 +6,7 @@ schedules = [
         "func_path": "users.tasks.find_subs_to_alert",
         "hook": "jobs.hooks.print_result",
         "args": None,
-        "type": Schedule.MINUTES,
+        # "type": Schedule.MINUTES,
+        "type": Schedule.DAILY,
     },
 ]
