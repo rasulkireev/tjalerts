@@ -9,4 +9,11 @@ schedules = [
         # "type": Schedule.MINUTES,
         "type": Schedule.DAILY,
     },
+    {
+        "name": "Find HN Comments to Analyze",
+        "func_path": "jobs.tasks.get_hn_pages_to_analyze",
+        "hook": "jobs.hooks.print_result",
+        "args": "36573871",
+        "type": Schedule.DAILY,
+    },
 ]

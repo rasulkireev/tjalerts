@@ -13,7 +13,7 @@ from hn_jobs.utils import add_users_context, floor_to_tens
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
 from .models import Post, Technology, Title
-from .tasks import analyze_hn_page
+from .tasks import get_hn_pages_to_analyze
 
 logger = logging.getLogger(__file__)
 
@@ -72,5 +72,5 @@ class TriggerAsyncTask(LoginRequiredMixin, UserPassesTestMixin, FormView):
 
     def form_valid(self, form):
         who_is_hiring_post_id = form.cleaned_data.get("who_is_hiring_post_id")  # noqa: F841
-        async_task(analyze_hn_page, who_is_hiring_post_id, hook="hooks.print_result")
+        async_task(get_hn_pages_to_analyze, who_is_hiring_post_id, hook="hooks.print_result")
         return super(TriggerAsyncTask, self).form_valid(form)
