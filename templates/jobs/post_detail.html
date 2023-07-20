@@ -3,15 +3,15 @@
 {% load markdown_extras %}
 
 {% block meta %}
-<title>Tech Job Post - {{ object.title }}</title>
+<title>Tech Job Post - {{ object.company.name }}</title>
 <meta name="description" content="{{ object.description }}" />
 <link rel="canonical" href="https://{{ request.get_host }}/job/{{ object.id }}" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@rasulkireev" />
-<meta name="twitter:title" content="Tech Job Post - {{ object.title }}" />
+<meta name="twitter:title" content="Tech Job Post - {{ object.company.name }}" />
 <meta name="twitter:description" content="{{ object.description }}" />
 <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
-<meta property="og:title" content="Tech Job Post - {{ object.title }}" />
+<meta property="og:title" content="Tech Job Post - {{ object.company.name }}" />
 <meta property="og:url" content="https://{{ request.get_host }}/job/{{ object.id }}" />
 <meta property="og:description" content="{{ object.description }}" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
@@ -94,7 +94,7 @@
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Tech Job Post - {{ object.title }}",
+    "name": "Tech Job Post - {{ object.company.name }}",
     "description": "{{ object.description }}",
     "url": "https://{{ request.get_host }}/job/{{ object.id }}"
   }
