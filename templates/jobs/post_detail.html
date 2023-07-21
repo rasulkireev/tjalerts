@@ -90,13 +90,26 @@
 {% endblock content %}
 
 {% block schema %}
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "Tech Job Post - {{ object.company.name }}",
-    "description": "{{ object.description }}",
-    "url": "https://{{ request.get_host }}/job/{{ object.id }}"
-  }
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "JobPosting",
+      "name":"{{ object.jobs.all.0.name }}",
+      "title":"{{ object.jobs.all.0.name }}",
+      "jobLocation": {
+        "@type": "Place",
+        "address": "{{ object.locations }}"
+      },
+      "description": "{{ object.description }}",
+      "datePosted": "{{ object.submitted_datetime }}",
+      "employmentType": "full-time",
+      "url": "{% if object.company_job_application_link %}{{ object.split_application_links.0 }}{% endif %}",
+      "directApply": true,
+      "hiringOrganization": {
+        "@type": "Organization",
+        "name": "{{ object.company.name }}"
+        "url": "{% if object.company.company_homepage_link %}{{ object.company.fixed_company_homepage_link }}{% endif %}"
+      }
+    }
   </script>
 {% endblock schema %}
