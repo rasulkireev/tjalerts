@@ -14,6 +14,7 @@ from users.forms import CreateAlertForm
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
 from .models import Post, Technology, Title
+from .queries import get_most_popular_technologies, get_most_popular_titles
 from .tasks import get_hn_pages_to_analyze
 
 logger = logging.getLogger(__file__)
@@ -56,6 +57,8 @@ class PostDetailView(DetailView):
             add_users_context(context, user)
 
         context["create_alert_form"] = CreateAlertForm
+        context["popular_titles"] = get_most_popular_titles()
+        context["popular_technologies"] = get_most_popular_technologies(min_count=2)
 
         return context
 
