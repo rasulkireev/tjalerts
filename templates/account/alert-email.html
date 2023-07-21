@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="description" content="List of companies hiring for people experience in {{ subscriber.technology_selected }}"/>
+      <title>{{ subscriber.technology_selected }} Job Alerts - {{ formatted_date }}</title>
+      <style>
+        .ad-box {
+          display: inline-flex;
+          flex-direction: column;
+          justify-content: flex-start;
+          border-radius: 0.375rem;
+          color: white;
+          background-color: black;
+          padding: 0.75rem 1rem;
+          font-size: 0.875rem; /* 14px */
+          line-height: 1.25rem; /* 20px */
+        }
+        .ad-box p {
+          margin: 0;
+        }
+        .ad-box a {
+          color: white;
+          font-weight: 600;
+        }
+      </style>
+  </head>
+
+  <body>
+      <p>Here are the companies that are looking for people that know {{ subscriber.technology_selected }}:</p>
+      <ul>
+          {% for post in posts %}
+              <li>
+                  <a href="https://{{ site_url }}{{ post.get_absolute_url }}" target="_blank">
+                    {{ post.company.name }}
+                  </a>
+              </li>
+          {% endfor %}
+      </ul>
+      <div class="ad-box">
+        <p>
+          If you are a company looking for the best employees, check out
+          <a href="https://gettalentleads.com" target="_blank">
+            TalentLeads
+          </a>
+        </p>
+      </div>
+      {% if posts.count == 0 %}
+          <p>There are no new companies that are looking for people who know {{ subscriber.technology_selected }}.</p>
+      {% endif %}
+  </body>
+</html>

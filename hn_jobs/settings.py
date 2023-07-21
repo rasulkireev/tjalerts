@@ -222,7 +222,8 @@ DEFAULT_FROM_EMAIL = "rasul@gettjalerts.com"
 SERVER_EMAIL = "error@gettjalerts.com"
 
 if DEBUG:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_HOST = "localhost"
+    EMAIL_PORT = 1025
 else:
     EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 

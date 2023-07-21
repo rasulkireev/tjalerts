@@ -1,25 +1,42 @@
 from datetime import datetime, timedelta
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.contrib.sites.models import Site
+from django.core.mail import EmailMultiAlternatives, send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django_q.tasks import async_task
 
+from jobs.queries import get_weekly_jobs_for_a_subscriber
+
 from .models import Alert, Subscriber
-from .utils import create_alert_message
 
 
 def send_alert(subscriber: Subscriber):
     current_date = datetime.now()
     week_number = (current_date.day - 1) // 7 + 1
     formatted_date = current_date.strftime("%B %Y, Week {}".format(week_number))
+    subject = f"Your Job Alerts for {subscriber.technology_selected} - {formatted_date}"
 
-    send_mail(
-        f"Your Job Alerts for {subscriber.technology_selected} - {formatted_date}",
-        create_alert_message(subscriber),
+    html_content = render_to_string(
+        "account/alert-email.html",
+        {
+            "subscriber": subscriber,
+            "formatted_date": formatted_date,
+            "posts": get_weekly_jobs_for_a_subscriber(subscriber),
+            "site_url": Site.objects.get_current().domain,
+        },
+    )
+    text_content = strip_tags(html_content)
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_content,
         settings.DEFAULT_FROM_EMAIL,
         [subscriber.email],
-        fail_silently=False,
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send()
 
     Alert.objects.create(subscriber=subscriber)
 
