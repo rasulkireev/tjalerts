@@ -18,6 +18,7 @@ def get_latest_submissions(number_of: int, for_homepage: bool = False):
             posts.annotate(num_technologies=Count("technologies"), num_jobs=Count("jobs"))
             .exclude(technologies__in=excluded_tech)
             .exclude(jobs__in=excluded_titles)
+            .exclude(company__name="")
             .filter(num_technologies__gt=0, num_jobs__gt=0)
         )
 
