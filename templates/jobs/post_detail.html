@@ -21,8 +21,8 @@
 {% block content %}
 <main class="max-w-4xl mx-auto mt-16 overflow-hidden">
     <div>
-      <div class="pb-2 border-b">
-        <div class="flex justify-between">
+      <div class="flex items-end justify-between pb-2 border-b">
+        <div class="flex flex-col">
           <div class="flex items-center space-x-3">
             <h3 class="text-lg font-medium text-gray-900 truncate">
               <a href="{% url 'post' object.id %}">
@@ -35,12 +35,16 @@
             </a>
             {% endif %}
           </div>
-          <p class="text-gray-500">Posted {{ object.submitted_datetime|timesince }} ago</p>
+          {% if object.company_job_application_link %}
+          <div>
+            <a href="{{ object.split_application_links.0 }}" target="_blank"
+              class="mt-1 text-sm text-gray-500 truncate">
+              Application Link
+            </a>
+          </div>
+          {% endif %}
         </div>
-        {% if object.company_job_application_link %}
-        <a href="{{ object.split_application_links.0 }}" target="_blank"
-          class="mt-1 text-sm text-gray-500 truncate">Application Link</a>
-        {% endif %}
+        <p class="text-gray-500">Posted {{ object.submitted_datetime|timesince }} ago</p>
       </div>
 
       {% if object.jobs.all.count == 1 and object.jobs.all.0.name == "" %}
