@@ -169,6 +169,7 @@ def analyze_hn_page(orig_data, comment_id):
 def create_valid_emails():
     posts_with_emails = Post.objects.exclude(emails="")
 
+    count = 0
     for post in posts_with_emails:
         # Split the name and pair it with a name if one exists.
         email_list = post.emails.split(",")
@@ -212,7 +213,10 @@ def create_valid_emails():
                 post=post,
                 is_approved=is_approved,
             )
+            count += 1
             logger.info(f"Email for {post} was created.")
+
+    return f"Created {count} emails."
 
 
 def find_bad_submitted_dates():
