@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "users.apps.UsersConfig",
     "jobs.apps.JobsConfig",
     "api.apps.ApiConfig",
+    "utils.apps.UtilsConfig",
 ]
 
 MIDDLEWARE = [
