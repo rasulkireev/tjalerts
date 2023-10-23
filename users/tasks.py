@@ -17,13 +17,15 @@ def send_alert(subscriber: Subscriber):
     week_number = (current_date.day - 1) // 7 + 1
     formatted_date = current_date.strftime("%B %Y, Week {}".format(week_number))
     subject = f"Your Job Alerts for {subscriber.technology_selected} - {formatted_date}"
+    posts = get_weekly_jobs_for_a_subscriber(subscriber)
 
     html_content = render_to_string(
         "account/alert-email.html",
         {
             "subscriber": subscriber,
             "formatted_date": formatted_date,
-            "posts": get_weekly_jobs_for_a_subscriber(subscriber),
+            "posts": posts,
+            "post_count": len(posts),
             "site_url": Site.objects.get_current().domain,
         },
     )
