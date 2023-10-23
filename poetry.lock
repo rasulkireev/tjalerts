@@ -678,6 +678,23 @@ files = [
 Django = ">=3.2"
 
 [[package]]
+name = "django-mjml"
+version = "1.1"
+description = "Use MJML in Django templates"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "django-mjml-1.1.tar.gz", hash = "sha256:1a057d790227ea30fe4088eebfcfd5993e4e92840021034a1415d5b5c7997841"},
+    {file = "django_mjml-1.1-py3-none-any.whl", hash = "sha256:30a57d83c2257a998530032bb5f8fe2c1ca582ec021f884fed2798ec7ab993a9"},
+]
+
+[package.dependencies]
+django = ">=2.2,<5.0"
+
+[package.extras]
+requests = ["requests (>=2.24)"]
+
+[[package]]
 name = "django-model-utils"
 version = "4.3.1"
 description = "Django model mixins and utilities"
@@ -2223,4 +2240,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ba301306228f129a1b7776b705653e0606bdc91f7ae03f91e81980b8261293e0"
+content-hash = "fa842f41c116f05209996d2c4585857328cf39d5ae06467c028493323a570568"
