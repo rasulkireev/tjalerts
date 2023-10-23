@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 
 import environ
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
@@ -262,3 +264,6 @@ MJML_HTTPSERVERS = [
         "HTTP_AUTH": ("8f8a2979-751d-4f54-b1fa-eced8024a3b7", env("MJML_SECRET")),
     }
 ]
+
+if not DEBUG:
+    sentry_sdk.init(dsn=env("SENTRY_DSN"), integrations=[DjangoIntegration()])
