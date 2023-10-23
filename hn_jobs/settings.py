@@ -52,10 +52,12 @@ INSTALLED_APPS = [
     "django_q",
     "django_filters",
     "anymail",
+    "mjml",
     "pages.apps.PagesConfig",
     "users.apps.UsersConfig",
     "jobs.apps.JobsConfig",
     "api.apps.ApiConfig",
+    "utils.apps.UtilsConfig",
 ]
 
 MIDDLEWARE = [
@@ -241,3 +243,11 @@ else:
             "LOCATION": env("REDIS_URL"),
         }
     }
+
+MJML_BACKEND_MODE = "httpserver"
+MJML_HTTPSERVERS = [
+    {
+        "URL": "https://api.mjml.io/v1/render",
+        "HTTP_AUTH": ("8f8a2979-751d-4f54-b1fa-eced8024a3b7", env("MJML_SECRET")),
+    }
+]

@@ -1,0 +1,22 @@
+ {
+  "autorun": false,
+  "terminals": [
+    {
+      "name": "Backend",
+      "focus": true,
+      "command": "poetry run python manage.py runserver"
+    },
+    {
+      "name": "Frontend",
+      "command": "npm run start"
+    },
+    {
+      "name": "Redis",
+      "command": "redis-stack-server --port 6381"
+    },
+    {
+      "name": "Workers",
+      "command": "poetry run python manage.py qcluster"
+    },
+  ]
+}
