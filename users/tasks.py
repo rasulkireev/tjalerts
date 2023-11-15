@@ -19,6 +19,9 @@ def send_alert(subscriber: Subscriber):
     subject = f"Your Job Alerts for {subscriber.technology_selected} - {formatted_date}"
     posts = get_weekly_jobs_for_a_subscriber(subscriber)
 
+    if posts.count() == 0:
+        return f"No posts found for {subscriber.technology_selected} - {formatted_date}"
+
     html_content = render_to_string(
         "account/alert-email.html",
         {
