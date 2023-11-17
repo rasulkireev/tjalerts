@@ -11,9 +11,10 @@ from django.views.generic import CreateView, UpdateView
 from django_q.tasks import async_task
 
 from hn_jobs.utils import add_users_context
+from jobs.models import Technology
 
 from .forms import CreateAlertForm, UpdateAlertForm
-from .models import CustomUser, Subscriber, Technology
+from .models import CustomUser, Subscriber
 from .tasks import find_subs_to_alert, send_confirmation_email
 
 logger = logging.getLogger(__file__)
