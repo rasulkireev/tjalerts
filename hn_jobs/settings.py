@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "django_q",
     "django_filters",
+    "django_extensions",
     "anymail",
     "mjml",
     "storages",

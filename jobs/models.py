@@ -20,8 +20,12 @@ class Post(TimeStampedModel):
     levels_of_experience = models.TextField(blank=True)
     technologies = models.ManyToManyField("Technology", related_name="post", blank=True, through="PostTechnology")
     capacity = models.TextField(blank=True)
-    compensation_summary = models.TextField(blank=True, null=True)
     years_of_experience = models.TextField(blank=True)
+
+    compensation_summary = models.TextField(blank=True, null=True)
+    min_salary = models.IntegerField(null=True, default=None)
+    max_salary = models.IntegerField(null=True, default=None)
+    currency = models.CharField(max_length=3, blank=True)
 
     # GEO
     locations = models.TextField(blank=True)

@@ -13,7 +13,7 @@ from django.db.models import Count
 from django_q.tasks import async_task
 
 from .models import Company, Email, Post, Technology, Title
-from .utils import clean_job_json_object, fix_email, is_generic
+from .utils import clean_job_json_object, fix_email, has_number, is_generic
 
 logger = logging.getLogger(__file__)
 openai.api_key = settings.OPENAI_KEY
@@ -76,6 +76,9 @@ def analyze_hn_page(orig_data, comment_id):
         - cities - (string of comma separated values)
         - countries - (string of comma separated values)
         - compensation_summary - (string, decribe the salary or other benefits)
+        - min_salary - (integer, if not available return 0)
+        - max_salary - (integer, if not available return 0)
+        - currency: (string, e.g "USD", "EUR", etc. if not available return "")
         - is_remote - (boolean)
         - remote_timezones - (string of comma separated values)
         - is_onsite - (boolean)
@@ -155,6 +158,9 @@ def analyze_hn_page(orig_data, comment_id):
         years_of_experience=cleaned_data["years_of_experience"],
         capacity=cleaned_data["capacity"],
         compensation_summary=cleaned_data["compensation_summary"],
+        min_salary=cleaned_data["min_salary"],
+        max_salary=cleaned_data["max_salary"],
+        currency=cleaned_data["currency"],
         company_job_application_link=cleaned_data["company_job_application_link"],
         names_of_the_contact_person=cleaned_data["names_of_the_contact_person"],
         levels_of_experience=cleaned_data["levels_of_experience"],
@@ -277,3 +283,67 @@ def delete_duplicate_jobs_posts():
     Post.objects.filter(who_is_hiring_comment_id__in=duplicate_ids).delete()
 
     return f"{len(duplicate_ids)} comments have been deleted"
+
+
+def update_min_and_max_salary():
+    jobs = Post.objects.filter(min_salary=None)
+
+    # if working in dev don't want to go through all the comments
+    if settings.DEBUG:
+        jobs = jobs[:25]
+
+    count = 0
+    error_count = 0
+    for job in jobs:
+        if job.compensation_summary == "" or not has_number(job.compensation_summary):
+            continue
+
+        try:
+            request = f"""Find the minimum and maximum salary for the job, based on the following information: '{job.compensation_summary}'.
+If there is no minimum or maximum salary, return 0. Do not lie, or make up numbers.
+If the summary states that sarlary is weekly or monthly, convert it to annualy please.
+Return a valid JSON Object with the following format:
+{{
+  min_salary: (integer, if not available return 0),
+  max_salary: (integer, if not available return 0),
+  currency: (string, e.g "USD", "EUR", etc. if not available return "")
+}}
+Do not return anything else. Just the JSON Object."""  # noqa: E501
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                temperature=0,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a helpful assistant.",
+                    },
+                    {"role": "user", "content": request},
+                ],
+            )
+            converted_comment_response = completion.choices[0].message
+        except (openai.error.RateLimitError, openai.error.APIError):
+            error_count += 1
+            continue
+
+        try:
+            json_converted_comment_response = json.loads(converted_comment_response.content)
+        except json.decoder.JSONDecodeError:
+            error_count += 1
+            continue
+
+        min_salary = json_converted_comment_response["min_salary"]
+        max_salary = json_converted_comment_response["max_salary"]
+
+        if min_salary == 0 and max_salary != 0:
+            min_salary = max_salary
+        elif max_salary == 0 and min_salary != 0:
+            max_salary = min_salary
+
+        job.min_salary = min_salary
+        job.max_salary = max_salary
+
+        job.currency = json_converted_comment_response["currency"]
+        job.save(update_fields=["min_salary", "max_salary", "currency"])
+        count += 1
+
+    return f"{count}/{jobs.count()} jobs have been updated. {error_count} errors occured."

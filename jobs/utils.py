@@ -41,6 +41,10 @@ def clean_job_json_object(original_comment: dict, nlp_data: dict) -> dict:
     check_boolean_value(nlp_data["is_remote"])
     check_boolean_value(nlp_data["is_onsite"])
 
+    if not has_number(nlp_data["compensation_summary"]):
+        nlp_data["min_salary"] = 0
+        nlp_data["max_salary"] = 0
+
     return nlp_data
 
 
@@ -135,3 +139,7 @@ def is_generic(email: str) -> bool:
     """
 
     return email.split("@")[0].lower() in GENERIC_KEYWORDS
+
+
+def has_number(input_string):
+    return any(char.isdigit() for char in input_string)

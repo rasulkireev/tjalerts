@@ -1,10 +1,17 @@
 from django.urls import path
 
-from .views import PostDetailView, PostListView, TriggerAsyncTask, find_bad_submitted_dates_view
+from .views import (
+    PostDetailView,
+    PostListView,
+    TriggerAsyncTask,
+    find_bad_submitted_dates_view,
+    update_min_and_max_salary_view,
+)
 
 urlpatterns = [
     path("", PostListView.as_view(), name="posts"),
     path("<uuid:pk>", PostDetailView.as_view(), name="post"),
     path("trigger-task/", TriggerAsyncTask.as_view(), name="trigger_task"),
     path("find_bad_submitted_dates/", find_bad_submitted_dates_view, name="find-bad-submitted-dates"),
+    path("update_min_and_max_salary/", update_min_and_max_salary_view, name="update_min_and_max_salary"),
 ]

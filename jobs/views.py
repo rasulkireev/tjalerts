@@ -16,7 +16,7 @@ from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
 from .models import Post, Technology, Title
 from .queries import get_most_popular_technologies, get_most_popular_titles
-from .tasks import find_bad_submitted_dates, get_hn_pages_to_analyze
+from .tasks import find_bad_submitted_dates, get_hn_pages_to_analyze, update_min_and_max_salary
 
 logger = logging.getLogger(__file__)
 
@@ -85,5 +85,11 @@ class TriggerAsyncTask(LoginRequiredMixin, UserPassesTestMixin, FormView):
 
 def find_bad_submitted_dates_view(request):
     async_task(find_bad_submitted_dates, hook="jobs.hooks.print_result", group="Find Bad Datetimes to Fix")
+
+    return redirect("trigger_task")
+
+
+def update_min_and_max_salary_view(request):
+    async_task(update_min_and_max_salary, hook="jobs.hooks.print_result", group="Populate min and max salary")
 
     return redirect("trigger_task")
