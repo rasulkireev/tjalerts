@@ -59,6 +59,11 @@ def find_subs_to_alert():
 
     count = 0
     for subscriber in waiting_subscribers:
+        posts = get_weekly_jobs_for_a_subscriber(subscriber)
+
+        if posts.count() == 0:
+            continue
+
         async_task(
             send_alert,
             subscriber,
