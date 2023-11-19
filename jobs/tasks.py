@@ -13,7 +13,7 @@ from django.db.models import Count
 from django_q.tasks import async_task
 
 from .models import Company, Email, Post, Technology, Title
-from .utils import clean_job_json_object, fix_email, has_number, is_generic
+from .utils import clean_job_json_object, fix_email, get_embedding, has_number, is_generic
 
 logger = logging.getLogger(__file__)
 openai.api_key = settings.OPENAI_KEY
@@ -67,6 +67,7 @@ def analyze_hn_page(orig_data, comment_id):
     who_is_hiring_comment_id = int(json_job["id"])
     hn_username = str(json_job["by"])
     unix_timestamp = int(json_job["time"])
+    vector = get_embedding(json_job["text"])
 
     logger.info(f"JSON for comment {comment_id}: {json_job}")
     request = f""""Convert the text below into json object with the following valid keys (give me an empty string if there is no info, ignore the content in  brackets, it is only to explain what I need):
@@ -165,6 +166,7 @@ def analyze_hn_page(orig_data, comment_id):
         names_of_the_contact_person=cleaned_data["names_of_the_contact_person"],
         levels_of_experience=cleaned_data["levels_of_experience"],
         emails=cleaned_data["emails"],
+        vector=vector,
     )
     post.save()
 
@@ -386,14 +388,7 @@ def backfill_vector_data(job):
     except KeyError:
         pass
 
-    text = json_job["text"].replace("\n", " ")
-
-    embedding = openai.Embedding.create(
-        input=[text],
-        model="text-embedding-ada-002",
-        temperature=0,
-    )
-    vector = embedding["data"][0]["embedding"]
+    vector = get_embedding(json_job["text"])
 
     job.vector = vector
     job.save(update_fields=["vector"])
