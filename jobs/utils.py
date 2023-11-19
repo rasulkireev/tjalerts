@@ -2,6 +2,8 @@ import logging
 import re
 from datetime import datetime
 
+import openai
+
 from .constants import GENERIC_KEYWORDS
 
 logger = logging.getLogger(__file__)
@@ -143,3 +145,15 @@ def is_generic(email: str) -> bool:
 
 def has_number(input_string):
     return any(char.isdigit() for char in input_string)
+
+
+def get_embedding(text):
+    text = text.replace("\n", " ")
+
+    embedding = openai.Embedding.create(
+        input=[text],
+        model="text-embedding-ada-002",
+        temperature=0,
+    )
+
+    return embedding["data"][0]["embedding"]
