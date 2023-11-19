@@ -320,9 +320,9 @@ If there is no minimum or maximum salary, return 0. Do not lie, or make up numbe
 If the summary states that sarlary is weekly or monthly, convert it to annualy please.
 Return a valid JSON Object with the following format:
 {{
-min_salary: (integer, if not available return 0),
-max_salary: (integer, if not available return 0),
-currency: (string, e.g "USD", "EUR", etc. if not available return "")
+  min_salary: (integer, if not available return 0),
+  max_salary: (integer, if not available return 0),
+  currency: (string, e.g "USD", "EUR", etc. if not available return "")
 }}
 Do not return anything else. Just the JSON Object."""  # noqa: E501
 
