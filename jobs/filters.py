@@ -1,5 +1,3 @@
-import logging
-
 from django import forms
 from django.core.validators import EMPTY_VALUES
 from django_filters import BooleanFilter, CharFilter, Filter, FilterSet, ModelMultipleChoiceFilter, OrderingFilter
@@ -8,8 +6,6 @@ from pgvector.django import L2Distance
 from .models import Post
 from .queries import get_most_popular_technologies
 from .utils import get_embedding
-
-logger = logging.getLogger(__file__)
 
 
 class VectorEmbeddingFilter(Filter):
