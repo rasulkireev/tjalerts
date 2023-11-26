@@ -200,6 +200,7 @@ ACCOUNT_FORMS = {
     "signup": "users.forms.CustomSignUpForm",
     "login": "users.forms.CustomLoginForm",
 }
+SOCIALACCOUNT_EMAIL_VERIFICATION = False
 if not DEBUG:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
