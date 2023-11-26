@@ -33,6 +33,14 @@ class HomeView(TemplateView):
         return context
 
 
+class PrivacyView(TemplateView):
+    template_name = "pages/privacy_policy.html"
+
+
+class TosView(TemplateView):
+    template_name = "pages/tos.html"
+
+
 class PricingView(TemplateView):
     template_name = "pages/pricing.html"
 

@@ -40,7 +40,7 @@
               <div class="md:col-span-1">
                 <div class="px-4 sm:px-0">
                   <h3 class="text-lg font-medium leading-6 text-gray-900">
-                    Subscription:
+                    Status:
                     <span class="text-green-700">
                       {% if user.paid %}
                         Pro
@@ -53,26 +53,6 @@
                     Here you can upgrade, cancel or change your payments information.
                   </p>
                 </div>
-              </div>
-              <div class="flex items-center px-4 mt-5 md:col-span-2 md:mt-0">
-                {% if subscription.status %}
-                  <form method="post" action="{% url 'create-customer-portal-session' %}">
-                    {% csrf_token %}
-                    <button
-                      class="inline-flex items-center px-3 py-2 text-white bg-green-600 border-2 border-transparent rounded-md hover:bg-green-700"
-                      type="submit"
-                    >
-                      Manage
-                    </button>
-                  </form>
-                {% else %}
-                    <a
-                      class="inline-flex items-center px-3 py-2 text-white bg-green-600 border-2 border-transparent rounded-md hover:bg-green-700"
-                      href="{% url 'upgrade-user' %}"
-                    >
-                      Upgrade
-                    </a>
-                {% endif %}
               </div>
             </div>
           </div>
