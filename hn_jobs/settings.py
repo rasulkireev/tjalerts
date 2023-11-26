@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.google",
     "django_q",
     "django_filters",
     "django_extensions",
@@ -197,6 +199,16 @@ ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_FORMS = {
     "signup": "users.forms.CustomSignUpForm",
     "login": "users.forms.CustomLoginForm",
+}
+
+SOCIALACCOUNT_PROVIDERS = {
+    "github": {
+        "SCOPE": [
+            "user",
+            "repo",
+            "read:org",
+        ],
+    }
 }
 
 LOGGING = {
