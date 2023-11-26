@@ -200,6 +200,8 @@ ACCOUNT_FORMS = {
     "signup": "users.forms.CustomSignUpForm",
     "login": "users.forms.CustomLoginForm",
 }
+if not DEBUG:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 SOCIALACCOUNT_PROVIDERS = {
     "github": {
