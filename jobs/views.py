@@ -39,7 +39,7 @@ class PostListView(FilterView):
 
         user = self.request.user
         if user.is_authenticated:
-            add_users_context(context, user)
+            add_users_context(context, user, self)
 
         return context
 
@@ -53,7 +53,7 @@ class PostDetailView(DetailView):
 
         user = self.request.user
         if user.is_authenticated:
-            add_users_context(context, user)
+            add_users_context(context, user, self)
 
         context["create_alert_form"] = CreateAlertForm
         context["popular_titles"] = get_most_popular_titles()
