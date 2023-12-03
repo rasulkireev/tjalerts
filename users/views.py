@@ -58,21 +58,38 @@ class AlertCreateView(SuccessMessageMixin, CreateView):
     model = Subscriber
     form_class = CreateAlertForm
     success_url = reverse_lazy("home")
-    success_message = "Thanks for subscribing :) Check your emails to confirm!"
 
     def form_valid(self, form):
+        user = self.request.user
+
+        if user:
+            form.instance.owner = user
+
         try:
             validate_technology_selected(form.cleaned_data["technology_selected"])
         except ValidationError:
             messages.add_message(self.request, messages.WARNING, "Please use a Technology from the dropdown list.")
             return redirect("home")
 
-        if Subscriber.objects.filter(email=form.instance.email).exists():
-            messages.add_message(self.request, messages.WARNING, "An alert already exists for this email.")
+        if user and Subscriber.objects.filter(email=user.email).count() >= 3:
+            messages.add_message(self.request, messages.WARNING, "Free users can only have 3 alerts.")
+            return redirect("home")
+        elif not user and Subscriber.objects.filter(email=form.instance.email).exists():
+            messages.add_message(self.request, messages.WARNING, "Sign up to create multiple alerts.")
             return redirect("home")
 
-        confirmation_url = self.request.build_absolute_uri(reverse("confirm_subscription", args=[form.instance.id]))
-        async_task(send_confirmation_email, form.cleaned_data, confirmation_url)
+        if user and Subscriber.objects.filter(email=user.email).latest("modified").confirmed is True:
+            form.instance.confirmed = True
+            messages.add_message(
+                self.request, messages.SUCCESS, "Alert has been added, you will start getting jobs soon!"
+            )
+        else:
+            confirmation_url = self.request.build_absolute_uri(reverse("confirm_subscription", args=[form.instance.id]))
+            async_task(send_confirmation_email, form.cleaned_data, confirmation_url)
+            messages.add_message(
+                self.request, messages.SUCCESS, "Thank for creating an alert! Check your emails to confirm!"
+            )
+
         return super(AlertCreateView, self).form_valid(form)
 
 
