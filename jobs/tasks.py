@@ -102,7 +102,7 @@ def analyze_hn_page(orig_data, comment_id):
 
     try:
         completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo-1106",
             temperature=0,
             messages=[
                 {
@@ -111,6 +111,7 @@ def analyze_hn_page(orig_data, comment_id):
                 },
                 {"role": "user", "content": request},
             ],
+            response_format={"type": "json_object"},
         )
         converted_comment_response = completion.choices[0].message
     except (openai.error.RateLimitError, openai.error.APIError) as e:
@@ -325,7 +326,7 @@ Return a valid JSON Object with the following format:
 Do not return anything else. Just the JSON Object."""  # noqa: E501
 
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-3.5-turbo-1106",
         temperature=0,
         messages=[
             {
@@ -334,6 +335,7 @@ Do not return anything else. Just the JSON Object."""  # noqa: E501
             },
             {"role": "user", "content": request},
         ],
+        response_format={"type": "json_object"},
     )
     converted_comment_response = completion.choices[0].message
 

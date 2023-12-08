@@ -93,7 +93,7 @@ class AlertCreateView(SuccessMessageMixin, CreateView):
         return super(AlertCreateView, self).form_valid(form)
 
 
-class AlertUpdateView(SuccessMessageMixin, UpdateView):
+class AlertConfirmedView(SuccessMessageMixin, UpdateView):
     model = Subscriber
     form_class = UpdateAlertForm
     template_name = "account/subscription-confirmation.html"
@@ -101,7 +101,7 @@ class AlertUpdateView(SuccessMessageMixin, UpdateView):
     success_message = "Thanks for confirming :) You will receive your alerts soon!"
 
     def form_valid(self, form):
-        response = super(AlertUpdateView, self).form_valid(form)
+        response = super(AlertConfirmedView, self).form_valid(form)
         async_task(find_subs_to_alert)
 
         return response

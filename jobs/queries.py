@@ -57,6 +57,11 @@ def get_most_popular_technologies(number_of: int = 0, min_count: int = 0):
 
 def get_weekly_jobs_for_a_subscriber(subscriber: Subscriber) -> str:
     seven_days_ago = timezone.now() - timezone.timedelta(days=7)
+
+    Post.objects.filter(
+        created__gte=seven_days_ago, technologies__name__in=[subscriber.values_list("technology_selected")]
+    ).distinct().values
+
     return Post.objects.filter(
-        created__gte=seven_days_ago, technologies__name=subscriber.technology_selected
+        created__gte=seven_days_ago, technologies__name__in=[subscriber.values_list("technology_selected")]
     ).distinct()

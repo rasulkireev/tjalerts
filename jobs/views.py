@@ -64,25 +64,6 @@ class PostDetailView(DetailView):
         return context
 
 
-class GenericForm(forms.Form):
-    who_is_hiring_post_id = forms.CharField()
-
-
-class TriggerAsyncTask(LoginRequiredMixin, UserPassesTestMixin, FormView):
-    login_url = "account_login"
-    success_url = reverse_lazy("home")
-    template_name = "jobs/trigger_task.html"
-    form_class = GenericForm
-
-    def test_func(self):
-        return self.request.user.is_staff
-
-    def form_valid(self, form):
-        who_is_hiring_post_id = form.cleaned_data.get("who_is_hiring_post_id")  # noqa: F841
-        async_task(get_hn_pages_to_analyze, who_is_hiring_post_id, hook="hooks.print_result")
-        return super(TriggerAsyncTask, self).form_valid(form)
-
-
 class HighestPaidBlogPostListView(TemplateView):
     template_name = "jobs/highest-paid-blog-post-list.html"
 
@@ -113,7 +94,26 @@ class HighestPaidJobsView(ListView):
         )
 
 
-# One time views
+# Manual Views
+class GenericForm(forms.Form):
+    who_is_hiring_post_id = forms.CharField()
+
+
+class TriggerAsyncTask(LoginRequiredMixin, UserPassesTestMixin, FormView):
+    login_url = "account_login"
+    success_url = reverse_lazy("home")
+    template_name = "jobs/trigger_task.html"
+    form_class = GenericForm
+
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def form_valid(self, form):
+        who_is_hiring_post_id = form.cleaned_data.get("who_is_hiring_post_id")  # noqa: F841
+        async_task(get_hn_pages_to_analyze, who_is_hiring_post_id, hook="hooks.print_result")
+        return super(TriggerAsyncTask, self).form_valid(form)
+
+
 def find_bad_submitted_dates_view(request):
     async_task(find_bad_submitted_dates, hook="jobs.hooks.print_result", group="Find Bad Datetimes to Fix")
 
