@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 from django import forms
 from django.contrib import messages
@@ -6,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Max
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, FormView, ListView, TemplateView, UpdateView
 from django_filters.views import FilterView
@@ -18,7 +19,7 @@ from utils.constants import HIRABLE_TECH_LIST_SLUGS
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
 from .forms import CreateAlertForm, UpdateAlertForm
-from .models import Alert, Post, Technology, Title
+from .models import Alert, AlertEmailSend, Post, Technology, Title
 from .queries import get_most_popular_technologies, get_most_popular_titles
 from .tasks import (
     create_backfill_vector_data_jobs,
@@ -44,10 +45,11 @@ class PostListView(FilterView):
     def get(self, request, *args, **kwargs):
         params = request.GET.copy()
 
-        del params["page"]
-        del params["o"]
-
-        logger.info(f"params: {params}")
+        try:
+            del params["page"]
+            del params["o"]
+        except KeyError:
+            pass
 
         return super().get(request, *args, **kwargs)
 
@@ -209,3 +211,16 @@ class AlertUpdateView(SuccessMessageMixin, UpdateView):
         async_task(find_users_to_alert)
 
         return response
+
+
+def unauthed_weekly_digest_view(request, alert_email_send_id):
+    template_name = "jobs/unauthed_weekly_digest.html"
+
+    alert_email_send = get_object_or_404(AlertEmailSend, id=alert_email_send_id)
+    alert = Alert.objects.get(email=alert_email_send.email)
+
+    post_filter = PostFilter(alert.filter)
+    queryset = post_filter.qs.filter(created__gte=alert_email_send.created - timedelta(days=7))
+
+    context = {"alert": alert, "queryset": queryset}
+    return render(request, template_name, context)

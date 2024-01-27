@@ -9,6 +9,7 @@ from .views import (
     TriggerAsyncTask,
     create_backfill_vector_data_jobs_view,
     find_bad_submitted_dates_view,
+    unauthed_weekly_digest_view,
     update_min_and_max_salary_view,
 )
 
@@ -27,4 +28,5 @@ urlpatterns = [
     path("create-alert", AlertCreateView.as_view(), name="create-alert"),
     path("confirm/<uuid:pk>/", AlertUpdateView.as_view(), name="confirm_subscription"),
     path("<slug:slug>/highest-paid/", HighestPaidJobsView.as_view(), name="highest-paid-job-blog-post"),
+    path("digest/<uuid:alert_email_send_id>/", unauthed_weekly_digest_view, name="unauthed_weekly_digest"),
 ]

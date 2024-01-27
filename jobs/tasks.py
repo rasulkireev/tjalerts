@@ -6,13 +6,19 @@ from datetime import datetime, timedelta
 import httpx
 import openai
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.core.validators import validate_email
 from django.db import transaction
 from django.db.models import Count
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from django_q.tasks import async_task
 
+from users.models import CustomUser
+
+from .filters import PostFilter
 from .models import Alert, AlertEmailSend, Company, Email, Post, Technology, Title
 from .utils import clean_job_json_object, fix_email, get_embedding, has_number, is_generic
 
@@ -437,4 +443,40 @@ def find_users_to_alert():
 
 
 def send_alerts(email, alerts):
-    return
+    current_date = datetime.now()
+    week_number = (current_date.day - 1) // 7 + 1
+    formatted_date = current_date.strftime("%B %Y, Week {}".format(week_number))
+    subject = f"Job Alerts for {formatted_date}"
+
+    user_status = "guest"
+    if CustomUser.objects.filter(email=email).exists():
+        user_status = "ser"
+
+    alert_email_send = AlertEmailSend.objects.create(email=email)
+    context = {
+        "alerts": [],
+        "new_jobs_count": 0,
+        "site_url": Site.objects.get_current().domain,
+        "formatted_date": formatted_date,
+        "user_status": user_status,
+        "alert_email_send": alert_email_send,
+    }
+
+    for idx, alert in enumerate(alerts):
+        name = alert.name if alert.name else idx
+        context["alerts"].append(name)
+        context["new_jobs_count"] += PostFilter(alert.filter).qs.count()
+
+    html_content = render_to_string("jobs/alert-email.html", context)
+    text_content = strip_tags(html_content)
+
+    letter = EmailMultiAlternatives(
+        subject,
+        text_content,
+        settings.DEFAULT_FROM_EMAIL,
+        [email],
+    )
+    letter.attach_alternative(html_content, "text/html")
+    letter.send()
+
+    return f"{email} is sent"
