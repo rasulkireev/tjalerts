@@ -192,7 +192,7 @@ class AlertCreateView(SuccessMessageMixin, CreateView):
                 )
         else:
             confirmation_url = self.request.build_absolute_uri(reverse("confirm_subscription", args=[form.instance.id]))
-            async_task(send_confirmation_email, form.cleaned_data, confirmation_url)
+            async_task(send_confirmation_email, form.cleaned_data, confirmation_url, group="Send Confirmation Email")
             messages.add_message(
                 self.request, messages.SUCCESS, "Thank for creating an alert! Check your emails to confirm!"
             )
@@ -209,7 +209,7 @@ class AlertUpdateView(SuccessMessageMixin, UpdateView):
 
     def form_valid(self, form):
         response = super(AlertUpdateView, self).form_valid(form)
-        async_task(find_users_to_alert)
+        async_task(find_users_to_alert, group="Find Users to Alert")
 
         return response
 
