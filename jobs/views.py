@@ -221,7 +221,7 @@ def unauthed_weekly_digest_view(request, alert_email_send_id):
     alert = Alert.objects.get(email=alert_email_send.email)
 
     post_filter = PostFilter(alert.filter)
-    queryset = post_filter.qs.filter(created__gte=alert_email_send.created - timedelta(days=7))
+    queryset = post_filter.qs.filter(submitted_datetime__gte=alert_email_send.created - timedelta(days=7))
 
     context = {"alert": alert, "queryset": queryset}
     return render(request, template_name, context)
@@ -240,7 +240,7 @@ def authed_weekly_digest_view(request):
 
     for idx, alert in enumerate(alerts):
         post_filter = PostFilter(alert.filter)
-        queryset = post_filter.qs.filter(created__gte=email_send.created - timedelta(days=7))
+        queryset = post_filter.qs.filter(submitted_datetime__gte=email_send.created - timedelta(days=7))
 
         if "technologies" in alert.filter and len(alert.filter) == 1 and alert.filter["technologies"][0]:
             name = f"{Technology.objects.get(id=alert.filter['technologies'][0]).name} Alert"
