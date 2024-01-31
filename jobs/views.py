@@ -220,7 +220,7 @@ def unauthed_weekly_digest_view(request, alert_email_send_id):
     template_name = "jobs/unauthed_weekly_digest.html"
 
     alert_email_send = get_object_or_404(AlertEmailSend, id=alert_email_send_id)
-    alert = Alert.objects.get(email=alert_email_send.email)
+    alert = Alert.objects.get(email=alert_email_send.email, user__isnull=True)
 
     post_filter = PostFilter(alert.filter)
     queryset = post_filter.qs.filter(submitted_datetime__gte=alert_email_send.created - timedelta(days=7))
