@@ -84,8 +84,11 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "posthog.sentry.django.PosthogDistinctIdMiddleware",
-    "kolo.middleware.KoloMiddleware",
 ]
+
+if DEBUG:
+    MIDDLEWARE.append("kolo.middleware.KoloMiddleware")
+
 
 ROOT_URLCONF = "hn_jobs.urls"
 
