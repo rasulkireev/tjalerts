@@ -26,7 +26,6 @@ django = "^4.1.7"
 django-ninja = "^0.21.0"
 django-q2 = "^1.5.4"
 redis = "^4.6.0"
-psycopg2-binary = "^2.9.9"
 django-mjml = "^1.1"
 django-storages = {extras = ["s3"], version = "^1.14.2"}
 sentry-sdk = {extras = ["django"], version = "^1.32.0"}
@@ -43,6 +42,7 @@ opentelemetry-api = "^1.24.0"
 opentelemetry-sdk = "^1.24.0"
 opentelemetry-instrumentation-psycopg2 = "^0.45b0"
 opentelemetry-instrumentation-redis = "^0.45b0"
+psycopg2 = "^2.9.9"
 
 [tool.poetry.dev-dependencies]
 
