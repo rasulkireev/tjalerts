@@ -313,3 +313,6 @@ if DEBUG:
     posthog.debug = True
 
 POSTHOG_DJANGO = {"distinct_id": lambda request: request.user and request.user.distinct_id}
+
+MEILI_URL = env("MEILI_URL")
+MEILI_KEY = env("MEILI_KEY")

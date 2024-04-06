@@ -18,5 +18,9 @@
       "name": "Redis",
       "command": "make redis"
     },
+    {
+      "name": "Meilisearch",
+      "command": "make meili"
+    },
   ]
 }
