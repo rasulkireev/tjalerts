@@ -14,10 +14,6 @@ export DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://signoz-otel-collector-proxy.cr.lvtd.dev
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 
-python manage.py collectstatic --noinput
-python manage.py migrate
-python manage.py createschedules
-
 while getopts ":sw" option; do
     case "${option}" in
         s)  # Run server
@@ -35,11 +31,14 @@ shift $((OPTIND - 1))
 
 # If no valid option provided, default to server
 if [ "$server" = true ]; then
+    python manage.py collectstatic --noinput
+    python manage.py migrate
     # python manage.py djstripe_sync_models
     export OTEL_SERVICE_NAME=${PROJECT_NAME}_${ENVIRONMENT:-dev}
     export OTEL_RESOURCE_ATTRIBUTES=service.name=${PROJECT_NAME}_${ENVIRONMENT:-dev}
     opentelemetry-instrument gunicorn ${PROJECT_NAME}.wsgi:application -c deployment/gunicorn.config.py --bind 0.0.0.0:80 --workers 3 --threads 2 --reload
 else
+    python manage.py createschedules
     export OTEL_SERVICE_NAME="${PROJECT_NAME}_${ENVIRONMENT:-dev}_workers"
     export OTEL_RESOURCE_ATTRIBUTES=service.name=${PROJECT_NAME}_${ENVIRONMENT:-dev}_workers
     opentelemetry-instrument python manage.py qcluster
