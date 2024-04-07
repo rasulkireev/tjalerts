@@ -21,7 +21,7 @@ urlpatterns = [
     path("find_bad_submitted_dates/", find_bad_submitted_dates_view, name="find-bad-submitted-dates"),
     path("update_min_and_max_salary/", update_min_and_max_salary_view, name="update_min_and_max_salary"),
     path(
-        "create_backfill_vector_data_jobs/",
+        "create_backfill_vector_data_jobs/<int:rebuild>/",
         create_backfill_vector_data_jobs_view,
         name="create_backfill_vector_data_jobs",
     ),
