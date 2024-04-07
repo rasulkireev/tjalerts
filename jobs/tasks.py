@@ -62,7 +62,7 @@ def get_hn_pages_to_analyze(who_is_hiring_post_id):
 
 
 def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
-    logger.info(f"Analyzing comment {comment_id}")
+    logger.info("Analyzing HN Comment", comment_id=comment_id)
     json_job = httpx.get(f"https://hacker-news.firebaseio.com/v0/item/{comment_id}.json").json()
 
     try:
@@ -76,7 +76,6 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
     unix_timestamp = int(json_job["time"])
     vector = get_embedding(json_job["text"])
 
-    logger.info(f"JSON for comment {comment_id}: {json_job}")
     request = f""""Convert the text below into json object with the following valid keys (give me an empty string if there is no info, ignore the content in  brackets, it is only to explain what I need):
         - company_name - (string)
         - job_titles - (string of comma separated values)
@@ -156,6 +155,7 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
         who_is_hiring_comment_id=who_is_hiring_comment_id,
         submitted_datetime=datetime.fromtimestamp(unix_timestamp),
         company=company_obj,
+        original_text=cleaned_data["text"],
         hn_username=hn_username,
         description=cleaned_data["description"],
         locations=cleaned_data["locations"],
@@ -365,8 +365,11 @@ Do not return anything else. Just the JSON Object."""  # noqa: E501
     return f"Job {job.id} has been updated."
 
 
-def create_backfill_vector_data_jobs():
-    jobs = Post.objects.filter(vector=None)
+def create_backfill_vector_data_jobs(rebuild=False):
+    if bool(rebuild):
+        jobs = Post.objects.all()
+    else:
+        jobs = Post.objects.filter(vector=None)
 
     count = 0
     for job in jobs:

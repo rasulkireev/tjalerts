@@ -4,7 +4,7 @@ from autoslug import AutoSlugField
 from django.db import models
 from django.urls import reverse
 from model_utils.models import TimeStampedModel
-from pgvector.django import VectorField
+from pgvector.django import HnswIndex, VectorField
 
 from utils.models import BaseModel
 
@@ -18,13 +18,14 @@ class Post(TimeStampedModel):
     hn_username = models.CharField(max_length=50, blank=True)
     submitted_datetime = models.DateTimeField()
 
+    original_text = models.TextField(blank=True)
     jobs = models.ManyToManyField("Title", related_name="post", blank=True, through="PostTitle")
     description = models.TextField(blank=True)
     levels_of_experience = models.TextField(blank=True)
     technologies = models.ManyToManyField("Technology", related_name="post", blank=True, through="PostTechnology")
     capacity = models.TextField(blank=True)
     years_of_experience = models.TextField(blank=True)
-    vector = VectorField(null=True)
+    vector = VectorField(null=True, dimensions=1536)
 
     compensation_summary = models.TextField(blank=True, null=True)
     min_salary = models.IntegerField(null=True, default=None)
@@ -58,6 +59,9 @@ class Post(TimeStampedModel):
 
     class Meta:
         ordering = ("-submitted_datetime",)
+        indexes = [
+            HnswIndex(name="vector_index", fields=["vector"], m=16, ef_construction=64, opclasses=["vector_l2_ops"])
+        ]
 
 
 class Technology(TimeStampedModel):
