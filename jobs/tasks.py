@@ -58,6 +58,11 @@ def get_hn_pages_to_analyze(who_is_hiring_post_id):
         else:
             logger.info(f"Job for {comment_id} already exists.")
 
+    try:
+        httpx.get(f"{settings.HEALTHCHECKS_HOST}/e79df9c2-8e2d-4e0a-8be8-1723682c375d", timeout=10)
+    except httpx.RequestException as e:
+        logger.error("Ping failed: %s" % e)
+
     return f"{count} have been sent to be analyzed."
 
 

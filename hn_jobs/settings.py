@@ -313,3 +313,5 @@ if DEBUG:
     posthog.debug = True
 
 POSTHOG_DJANGO = {"distinct_id": lambda request: request.user and request.user.distinct_id}
+
+HEALTHCHECKS_HOST = "https://healthchecks.cr.lvtd.dev/ping"
