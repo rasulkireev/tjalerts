@@ -84,6 +84,7 @@ def get_jobs(request, technologies=Query(None)):
 
         entry = {
             "company_name": post.company.name,
+            "company_url": post.company.company_homepage_link,
             "description": post.description,
             "compensation_summary": post.compensation_summary,
             "min_salary": post.min_salary,
