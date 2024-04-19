@@ -18,6 +18,8 @@ class Post(TimeStampedModel):
     hn_username = models.CharField(max_length=50, blank=True)
     submitted_datetime = models.DateTimeField()
 
+    source = models.CharField(max_length=200, default="Hacker News")
+
     original_text = models.TextField(blank=True)
     jobs = models.ManyToManyField("Title", related_name="post", blank=True, through="PostTitle")
     description = models.TextField(blank=True)
