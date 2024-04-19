@@ -88,6 +88,7 @@ def get_jobs(request, technologies=Query(None)):
             "compensation_summary": post.compensation_summary,
             "min_salary": post.min_salary,
             "max_salary": post.max_salary,
+            "is_remote": post.is_remote,
             "technologies": post_technologies,
             "title": post_titles,
             "id": str(post.id),
