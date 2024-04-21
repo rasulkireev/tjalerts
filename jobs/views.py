@@ -14,6 +14,7 @@ from django_filters.views import FilterView
 from django_q.tasks import async_task
 
 from hn_jobs.utils import add_users_context, get_tjalerts_logger, validate_technology_selected
+from jobs.utils import default_alert_name
 from utils.constants import HIRABLE_TECH_LIST_SLUGS
 
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
@@ -244,6 +245,25 @@ def unsubscribe_from_unauthed_alert(request, alert_email_send_id):
 
 
 @login_required(login_url="account_login")
+def toggle_subscription_from_authed_alert(request, alert_id):
+    alert = get_object_or_404(Alert, id=alert_id)
+
+    if request.method == "POST":
+        alert.unsubscribed = not alert.unsubscribed
+        alert.save()
+
+        custom_message = (
+            "You have been unsubscribed from the alert successfully."
+            if alert.unsubscribed
+            else "You have been subscribed to the alert successfully."
+        )
+        messages.success(request, custom_message)
+        return redirect(reverse("settings"))
+
+    return render(request, "jobs/toggle_subscription_from_authed_alert.html", {"alert": alert})
+
+
+@login_required(login_url="account_login")
 def authed_weekly_digest_view(request):
     template_name = "jobs/authed_weekly_digest.html"
 
@@ -258,10 +278,7 @@ def authed_weekly_digest_view(request):
         post_filter = PostFilter(alert.filter)
         queryset = post_filter.qs.filter(submitted_datetime__gte=email_send.created - timedelta(days=7))
 
-        if "technologies" in alert.filter and len(alert.filter) == 1 and alert.filter["technologies"][0]:
-            name = f"{Technology.objects.get(id=alert.filter['technologies'][0]).name} Alert"
-        else:
-            name = alert.name if alert.name else f"Alert #{idx+1}"
+        name = default_alert_name(alert, idx)
 
         context["alerts"].append(
             {
