@@ -2,7 +2,7 @@ from django.urls import path
 
 from .views import (
     AlertCreateView,
-    AlertUpdateView,
+    ConfirmAlertView,
     HighestPaidJobsView,
     PostDetailView,
     PostListView,
@@ -11,6 +11,7 @@ from .views import (
     create_backfill_vector_data_jobs_view,
     find_bad_submitted_dates_view,
     unauthed_weekly_digest_view,
+    unsubscribe_from_unauthed_alert,
     update_min_and_max_salary_view,
 )
 
@@ -27,8 +28,9 @@ urlpatterns = [
     ),
     # path("highest-paid-list", HighestPaidBlogPostListView.as_view(), name="highest-paid-blog-posts"),
     path("create-alert", AlertCreateView.as_view(), name="create-alert"),
-    path("confirm/<uuid:pk>/", AlertUpdateView.as_view(), name="confirm_subscription"),
+    path("confirm/<uuid:pk>/", ConfirmAlertView.as_view(), name="confirm_subscription"),
     path("<slug:slug>/highest-paid/", HighestPaidJobsView.as_view(), name="highest-paid-job-blog-post"),
     path("digest/<uuid:alert_email_send_id>/", unauthed_weekly_digest_view, name="unauthed_weekly_digest"),
     path("digest/", authed_weekly_digest_view, name="authed_weekly_digest"),
+    path("unsubscribe/<uuid:alert_email_send_id>/", unsubscribe_from_unauthed_alert, name="unauthed_alert_unsubscribe"),
 ]
