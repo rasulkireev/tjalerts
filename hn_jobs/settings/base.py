@@ -17,10 +17,11 @@ import environ
 import posthog
 import sentry_sdk
 import structlog
+from opentelemetry import trace
 from posthog.sentry.posthog_integration import PostHogIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 env = environ.Env(
@@ -233,28 +234,6 @@ SOCIALACCOUNT_PROVIDERS = {
     },
 }
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["console"]},
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "formatter": "app",
-            "level": "INFO",
-        },
-    },
-    "loggers": {
-        "django": {"handlers": ["console"], "level": "INFO", "propagate": True},
-    },
-    "formatters": {
-        "app": {
-            "format": ("%(asctime)s [%(levelname)-8s] " "(%(module)s.%(funcName)s) %(message)s"),
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-}
-
 Q_CLUSTER = {
     "name": "hn_jobs-q",
     "timeout": 90,
@@ -313,27 +292,82 @@ INTERNAL_IPS = [
 posthog.project_api_key = env("POSTHOG_API_KEY")
 posthog.host = "https://app.posthog.com"
 if DEBUG:
-    posthog.debug = True
+    # posthog.debug = True
+    posthog.disabled = True
 
 POSTHOG_DJANGO = {"distinct_id": lambda request: request.user and request.user.distinct_id}
 
 HEALTHCHECKS_HOST = "https://healthchecks.cr.lvtd.dev/ping"
 
+
+def extract_from_record(logger, name, event_dict):
+    """
+    Extract thread name and add them to the event dict.
+    """
+    record = event_dict["_record"]
+    event_dict["thread_id"] = record.thread
+    return event_dict
+
+
+def add_open_telemetry_spans(_, __, event_dict):
+    span = trace.get_current_span()
+    if not span.is_recording():
+        return event_dict
+
+    ctx = span.get_span_context()
+    parent = getattr(span, "parent", None)
+
+    event_dict["span_id"] = f"{ctx.span_id:x}"
+    event_dict["trace_id"] = f"{ctx.trace_id:x}"
+    if parent:
+        event_dict["parent_span_id"] = f"{parent.span_id:x}"
+
+    return event_dict
+
+
+DJANGO_LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "DEBUG")
+DJANGO_REQUEST_LOG_LEVEL = os.getenv("DJANGO_REQUEST_LOG_LEVEL", "INFO")
+DJANGO_DATABASE_LOG_LEVEL = os.getenv("DJANGO_DATABASE_LOG_LEVEL", "CRITICAL")
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
     "formatters": {
+        "simple": {"format": "%(levelname)s %(message)s"},
+        "verbose": {"format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s"},
+        "json": {"format": "%(message)s"},
         "json_formatter": {
             "()": structlog.stdlib.ProcessorFormatter,
-            "processor": structlog.processors.JSONRenderer(),
+            "processors": [
+                extract_from_record,
+                structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                structlog.processors.JSONRenderer(),
+            ],
         },
         "plain_console": {
             "()": structlog.stdlib.ProcessorFormatter,
             "processor": structlog.dev.ConsoleRenderer(),
         },
+        "key_value": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(key_order=["timestamp", "level", "event", "logger"]),
+        },
+    },
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",
+        },
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
     },
     "handlers": {
         "console": {
+            "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "plain_console",
             "level": "DEBUG",
@@ -348,32 +382,72 @@ LOGGING = {
             "formatter": "json_formatter",
             "level": "DEBUG",
         },
+        "null": {
+            "class": "logging.NullHandler",
+        },
     },
     "loggers": {
         "django_structlog": {
-            "handlers": ["console", "json_console"],
-            "level": "INFO",
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+            "propagate": False,
+        },
+        "django_structlog.middlewares": {
+            "level": DJANGO_REQUEST_LOG_LEVEL,
+        },
+        "django": {
+            "handlers": ["console"],
+            "level": DJANGO_LOG_LEVEL,
+        },
+        # DB logs
+        "django.db.backends": {
+            "level": DJANGO_DATABASE_LOG_LEVEL,
+        },
+        # Use structlog middleware
+        "django.server": {
+            "handlers": ["null"],
+            "propagate": False,
+        },
+        # Use structlog middleware
+        "django.request": {
+            "handlers": ["null"],
+            "propagate": False,
         },
         "tjalerts": {
-            "handlers": ["console", "json_console"],
-            "level": "INFO",
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
         },
     },
 }
 
+base_structlog_processors = [
+    structlog.contextvars.merge_contextvars,
+    structlog.stdlib.add_logger_name,
+    structlog.stdlib.add_log_level,
+    add_open_telemetry_spans,
+    structlog.stdlib.filter_by_level,
+    # Perform %-style formatting.
+    structlog.stdlib.PositionalArgumentsFormatter(),
+    # Add a timestamp in ISO 8601 format.
+    structlog.processors.TimeStamper(fmt="iso"),
+    structlog.processors.StackInfoRenderer(),
+    # If some value is in bytes, decode it to a unicode str.
+    structlog.processors.UnicodeDecoder(),
+    # Add callsite parameters.
+    structlog.processors.CallsiteParameterAdder(
+        {
+            structlog.processors.CallsiteParameter.FILENAME,
+            structlog.processors.CallsiteParameter.FUNC_NAME,
+            structlog.processors.CallsiteParameter.LINENO,
+        }
+    ),
+]
+
+base_structlog_formatter = [structlog.stdlib.ProcessorFormatter.wrap_for_formatter]
+
 structlog.configure(
-    processors=[
-        structlog.contextvars.merge_contextvars,
-        structlog.stdlib.filter_by_level,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.stdlib.add_logger_name,
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.processors.UnicodeDecoder(),
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
+    processors=base_structlog_processors + base_structlog_formatter,  # type: ignore
     logger_factory=structlog.stdlib.LoggerFactory(),
     cache_logger_on_first_use=True,
 )
