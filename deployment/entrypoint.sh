@@ -10,7 +10,6 @@ fi
 
 # All commands before the conditional ones
 export PROJECT_NAME=hn_jobs
-export DJANGO_SETTINGS_MODULE=${PROJECT_NAME}.settings
 export OTEL_EXPORTER_OTLP_ENDPOINT=https://signoz-otel-collector-proxy.cr.lvtd.dev
 export OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
 
