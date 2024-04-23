@@ -1737,6 +1737,21 @@ asgi = ["opentelemetry-instrumentation-asgi (==0.45b0)"]
 instruments = ["django (>=1.10)"]
 
 [[package]]
+name = "opentelemetry-instrumentation-logging"
+version = "0.45b0"
+description = "OpenTelemetry Logging instrumentation"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "opentelemetry_instrumentation_logging-0.45b0-py3-none-any.whl", hash = "sha256:bfaaca6862e84bb41b434178fba69afdb622f226cfdee243acb3959b65c97b48"},
+    {file = "opentelemetry_instrumentation_logging-0.45b0.tar.gz", hash = "sha256:48bfb6161a09f210c28a30295c4d217c4703e2d05d1df04fd3ab19ea30837978"},
+]
+
+[package.dependencies]
+opentelemetry-api = ">=1.12,<2.0"
+opentelemetry-instrumentation = "0.45b0"
+
+[[package]]
 name = "opentelemetry-instrumentation-psycopg2"
 version = "0.45b0"
 description = "OpenTelemetry psycopg2 instrumentation"
@@ -2887,4 +2902,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7309a987a6fd73158a69bb4ddf4ea87cd25dcdee9f9c2f8fd18c9cd7d633af46"
+content-hash = "f2933f54176cb27f83d26d75c47882d3f6b1b18d8c035db1f76a8286240a32bc"
