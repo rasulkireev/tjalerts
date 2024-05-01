@@ -134,6 +134,7 @@ class HighestPaidJobsView(ListView):
         context["tech_id"] = tech.id
         context["canonical_url"] = self.request.build_absolute_uri(self.request.path)
         context["latest_date"] = latest_date
+        context["create_alert_form"] = CreateAlertForm
 
         return context
 
