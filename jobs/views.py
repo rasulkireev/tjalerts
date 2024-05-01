@@ -116,6 +116,26 @@ class HighestPaidJobsView(ListView):
     template_name = "jobs/highest-paid-job.html"
     model = Post
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        tech_name = (
+            Technology.objects.filter(slug__icontains=self.kwargs.get("slug"))
+            .annotate(post_count=Count("post"))
+            .order_by("-post_count")
+            .first()
+        ).name
+
+        data = self.get_queryset()
+        dates = data.values_list("created", flat=True)
+        latest_date = max(dates)
+
+        context["tech_name"] = tech_name
+        context["canonical_url"] = self.request.build_absolute_uri(self.request.path)
+        context["latest_date"] = latest_date
+
+        return context
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
@@ -132,6 +152,7 @@ class HighestPaidJobsView(ListView):
 
         logger.info("Got all related tech ids", tech_id=tech_id, number_of_child_ids=len(child_ids))
 
+        # This is to avoid multiple posting by a single company
         subquery = Post.objects.values("company").annotate(latest_post=Max("submitted_datetime")).values("latest_post")
 
         return (
