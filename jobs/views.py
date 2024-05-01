@@ -119,18 +119,19 @@ class HighestPaidJobsView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        tech_name = (
+        tech = (
             Technology.objects.filter(slug__icontains=self.kwargs.get("slug"))
             .annotate(post_count=Count("post"))
             .order_by("-post_count")
             .first()
-        ).name
+        )
 
         data = self.get_queryset()
         dates = data.values_list("created", flat=True)
         latest_date = max(dates)
 
-        context["tech_name"] = tech_name
+        context["tech_name"] = tech.name
+        context["tech_id"] = tech.id
         context["canonical_url"] = self.request.build_absolute_uri(self.request.path)
         context["latest_date"] = latest_date
 
