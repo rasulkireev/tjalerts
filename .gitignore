@@ -1,6 +1,8 @@
 dump.rdb
 
 .kolo/
+.idea/
+.ruff_cache/
 
 # DB
 backup-dbs/

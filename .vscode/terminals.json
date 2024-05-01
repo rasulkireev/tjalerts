@@ -4,19 +4,19 @@
     {
       "name": "Backend",
       "focus": true,
-      "command": "poetry run python manage.py runserver"
+      "command": "poetry run python manage.py runserver",
     },
     {
       "name": "Frontend",
-      "command": "npm run start"
+      "command": "npm run start",
     },
     {
       "name": "Workers",
-      "command": "poetry run python manage.py qcluster"
+      "command": "poetry run python manage.py qcluster",
     },
     {
       "name": "Redis",
-      "command": "make redis"
+      "command": "make redis",
     },
   ]
 }

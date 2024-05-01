@@ -16,12 +16,17 @@
   {% block meta %}
   <title>Tech Job Alerts</title>
   <meta name="description" content="Get notified when the new Tech Jobs are published." />
+  <meta name="keywords" content="sample, webpage, meta tags, SEO" />
+  <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://{{ request.get_host }}/" />
+
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Tech Job Alerts" />
   <meta property="og:url" content="https://{{ request.get_host }}/" />
   <meta property="og:description" content="Get notified when the new Tech Jobs are published." />
   <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+  <meta property="og:locale" content="en_US" />
+
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:creator" content="@rasulkireev" />
   <meta name="twitter:site" content="@rasulkireev" />

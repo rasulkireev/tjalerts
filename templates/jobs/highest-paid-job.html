@@ -4,57 +4,108 @@
 {% load webpack_loader static %}
 {% load url_utils %}
 
+{% block meta %}
+<title>Top 10 Highest Paying Companies that use {{ tech_name }}</title>
+<meta name="description" content="List of the top 10 highest paying companies that use {{ tech_name }}." />
+<meta name="keywords" content="Tech Jobs, {{ tech_name }}, Highest Salaries, Highest {{ tech_name }} Salaries, Highest Paying {{ tech_name }} Companies" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="{{ canonical_url }}" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Top 10 Highest Paying Companies that use {{ tech_name }}" />
+<meta property="og:url" content="{{ canonical_url }}" />
+<meta property="og:description" content="List of the top 10 highest paying companies that use {{ tech_name }}." />
+<meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="@rasulkireev" />
+<meta name="twitter:site" content="@rasulkireev" />
+<meta name="twitter:title" content="Top 10 Highest Paying Companies that use {{ tech_name }}" />
+<meta name="twitter:description" content="List of the top 10 highest paying companies that use {{ tech_name }}." />
+<meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+{% endblock meta %}
+
 {% block content %}
+<article itemscope itemtype="https://schema.org/BlogPosting" itemid="{{ canonical_url }}">
+    <div class="px-6 py-20 bg-white lg:px-8">
+      <div class="max-w-4xl mx-auto text-base leading-7 text-gray-700">
+        <header>
+            <h1 itemprop="name" class="mt-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Top 10 Highest Paying Companies that use {{ tech_name }}
+            </h1>
 
-<div class="px-6 py-20 bg-white lg:px-8">
-  <div class="max-w-3xl mx-auto text-base leading-7 text-gray-700">
-    <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Highest Paid {{ view.kwargs.slug|capfirst }} Jobs</h1>
-    <div class="max-w-2xl mt-2">
-      <ul role="list" class="mt-4 space-y-4 text-gray-600">
-        {% for object in object_list %}
-          <li>
-            <a class="flex flex-col space-y-2 bg-white divide-y rounded-md" href="{% url 'post' object.id %}">
-              <div class="flex items-center justify-between w-full py-2">
-                <div class="flex-1">
-                  <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-medium text-gray-900 truncate">
-                      {% if object.company.name %}
-                        {{ object.company.name }}
-                      {% else %}
-                        Stealth
-                      {% endif %}
-                    </h2>
-                  </div>
-                  <p class="mt-2">
-                    Here is what {{ object.company.name }} pays you: {{ object.compensation_summary }}.
-                  </p>
-
-                  <p class="mt-2">
-                    {{ object.submitted_datetime|timesince }} ago {{ object.company.name }} created a job listing looking for
-                    {% for title in object.jobs.all %}
-                    <span>{{ title.name }}{% include "components/comma.html" %}</span>
-                    {% endfor %}
-                  </p>
-
-                  <p class="mt-2">
-                    Folks at {{ object.company.name }} use
-                    {% for technology in object.technologies.all %}
-                      <span>{{ technology.name }}{% include "components/comma.html" %}</span>
-                    {% endfor %} in their day to day.
-                  </p>
-
-                  <p class="mt-2">
-                    {{ object.description }}
-                  </p>
-
-                </div>
-              </div>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
+            <div class="hidden">
+              <p>Posted by <span itemprop="author" itemscope itemtype="https://schema.org/Person">
+                  <span itemprop="name">
+                    <a itemprop="url" href="https://www.rasulkireev.com/">Rasul Kireev</a>
+                  </span>
+                </span> in
+                <span itemprop="locationCreated">Newark, NJ</span>
+                on <time itemprop="datePublished" datetime="2024-01-01T17:30:57+01:00">Jan 01, 2024</time>
+                , and updated on
+                <time itemprop="dateModified" datetime="{{ latest_date }}">{{ latest_date }}</time>.
+            </p>
+            </div>
+        </header>
+        <section itemprop="abstract" class="hidden">
+            <h2>Abstract</h2>
+            <p>List of the top 10 highest paying companies that use {{ tech_name }}.</p>
+        </section>
+        <section itemprop="articleBody">
+            <div class="mt-2">
+              <ul role="list" class="mt-4 space-y-4 text-gray-600">
+                {% for object in object_list %}
+                  <li>
+                    <a class="flex flex-col space-y-2 bg-white divide-y rounded-md" href="{% url 'post' object.id %}">
+                      <div class="flex items-center justify-between w-full py-2">
+                        <div class="flex-1">
+                          <div class="flex items-center justify-between">
+                            <h2 class="text-lg font-medium text-gray-900 truncate">
+                              {% if object.company.name %}
+                                {{ object.company.name }}
+                              {% else %}
+                                Stealth
+                              {% endif %}
+                            </h2>
+                          </div>
+                          <p class="mt-2">
+                            Here is what {{ object.company.name }} pays you: {{ object.compensation_summary }}.
+                          </p>
+                          <p class="mt-2">
+                            {{ object.submitted_datetime|timesince }} ago {{ object.company.name }} created a job listing looking for
+                            {% for title in object.jobs.all %}
+                            <span>{{ title.name }}{% include "components/comma.html" %}</span>
+                            {% endfor %}
+                          </p>
+                          <p class="mt-2">
+                            Folks at {{ object.company.name }} use
+                            {% for technology in object.technologies.all %}
+                              <span>{{ technology.name }}{% include "components/comma.html" %}</span>
+                            {% endfor %} in their day to day.
+                          </p>
+                          <p class="mt-2">
+                            {{ object.description }}
+                          </p>
+                        </div>
+                      </div>
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+        </section>
+      </div>
     </div>
-  </div>
-</div>
-
+    <footer class="hidden">
+        <p>Tagged with: <span itemprop="keywords">
+            Tech Jobs, {{ tech_name }}, Highest Salaries, Highest {{ tech_name }} Salaries, Highest Paying {{ tech_name }} Companies
+        </span>
+        </p>
+        <p itemprop="copyrightNotice">© {{ latest_date|date:"Y" }} <span itemprop="publisher" itemscope itemtype="https://schema.org/Organization">
+            <span itemprop="name">TJ Alerts</span>
+          </span>
+        </p>
+      </footer>
+</article>
 {% endblock content %}
