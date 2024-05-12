@@ -6,9 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Count, Max
+from django.db.models import Count, Exists, Max, OuterRef
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.generic import CreateView, DetailView, FormView, ListView, TemplateView, UpdateView
 from django_filters.views import FilterView
 from django_q.tasks import async_task
@@ -20,7 +21,7 @@ from utils.constants import HIRABLE_TECH_LIST_SLUGS
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
 from .forms import ConfirmAlertForm, CreateAlertForm
-from .models import Alert, AlertEmailSend, Post, Technology, TechnologyMapping, Title
+from .models import Alert, AlertEmailSend, Company, Post, Technology, TechnologyMapping, Title
 from .queries import get_most_popular_technologies, get_most_popular_titles
 from .tasks import (
     create_backfill_vector_data_jobs,
@@ -323,3 +324,34 @@ def authed_weekly_digest_view(request):
         )
 
     return render(request, template_name, context)
+
+
+class CompanyJobsView(ListView):
+    template_name = "jobs/company-jobs.html"
+    model = Post
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+
+        return queryset.filter(company__slug=self.kwargs.get("slug"), submitted_datetime__gte=two_months_ago)
+
+
+class CompaniesJobsView(ListView):
+    template_name = "jobs/companies-with-jobs.html"
+    model = Company
+
+    def get_queryset(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("company")
+
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(has_recent_posts=Exists(recent_posts.filter(company=OuterRef("pk"))))
+            .filter(has_recent_posts=True)
+            .exclude(name="")
+            .order_by("name")
+        )
+
+        return queryset
