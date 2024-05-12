@@ -135,19 +135,20 @@
       "@type": "JobPosting",
       "name":"{{ object.jobs.all.0.name }}",
       "title":"{{ object.jobs.all.0.name }}",
-      "jobLocation": {
+      {% if object.locations %}"jobLocation": {
         "@type": "Place",
         "address": "{{ object.locations }}"
-      },
-      "description": "{{ object.description }}",
-      "datePosted": "{{ object.submitted_datetime }}",
-      "employmentType": "full-time",
-      "url": "{% if object.company_job_application_link %}{{ object.split_application_links.0 }}{% endif %}",
-      "directApply": true,
+      },{% endif %}
+      "description": "{{ job.description|safe }}",
+      "datePosted": "{{ job.submitted_datetime|date:'Y-m-d' }}",
+      "validThrough": "{{ job.submitted_datetime|plus_days:30|date:'Y-m-d' }}",
+      "employmentType": "Full-time",
+      {% if object.company_job_application_link %}"url": "{{ object.split_application_links.0 }}",
+      "directApply": true,{% endif %}
       "hiringOrganization": {
         "@type": "Organization",
-        "name": "{{ object.company.name }}",
-        "url": "{% if object.company.company_homepage_link %}{{ object.company.fixed_company_homepage_link }}{% endif %}"
+        "name": "{{ object.company.name }}"{% if object.company.company_homepage_link %},
+        "sameAs": "{{ object.company.fixed_company_homepage_link }}"{% endif %}
       }
     }
   </script>

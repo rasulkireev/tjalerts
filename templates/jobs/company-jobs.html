@@ -33,14 +33,15 @@
       "url": "https://{{ request.get_host }}{% url 'post' job.id %}",
       "item": {
         "@type": "JobPosting",
-        "title": "{{ job.jobs.all.0 }}",
+        "title": "{{ job.jobs.all.0.name }}",
         "description": "{{ job.description|safe }}",
         "datePosted": "{{ job.submitted_datetime|date:'Y-m-d' }}",
         "validThrough": "{{ job.submitted_datetime|plus_days:30|date:'Y-m-d' }}",
         "employmentType": "Full-time",
         "hiringOrganization": {
           "@type": "Organization",
-          "name": "{{ object_list.0.company.name }}"
+          "name": "{{ job.company.name }}"{% if job.company.company_homepage_link %},
+          "sameAs": "{{ job.company.fixed_company_homepage_link }}"{% endif %}
         }
       }
     }{% if not forloop.last %},{% endif %}
