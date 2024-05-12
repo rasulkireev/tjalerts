@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from django.contrib import sitemaps
 from django.contrib.sitemaps import GenericSitemap
-from django.db.models import Count
+from django.db.models import Count, Max
 from django.urls import reverse
 from django.utils import timezone
 
@@ -31,7 +31,7 @@ class HighestPaidJobsListicleSitemap(sitemaps.Sitemap):
         return Technology.objects.filter(slug__in=HIRABLE_TECH_LIST_SLUGS)
 
     def lastmod(self, obj):
-        return obj.modified
+        return Post.objects.filter(company=obj).aggregate(latest_date=Max("submitted_datetime"))["latest_date"]
 
     def location(self, obj):
         return reverse("highest-paid-job-blog-post", kwargs={"slug": obj.slug})
