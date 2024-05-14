@@ -139,10 +139,7 @@
       "title":"{{ object.jobs.all.0.name }}",
       "jobLocation": {
         "@type": "Place",
-        "address": {
-          "@type": "Text",
-          "name": {% if object.locations %}"{{ object.locations }}"{% else %}"Remote"{% endif %}
-        }
+        "address": {% if object.locations %}"{{ object.locations }}"{% else %}"Remote"{% endif %}
       },
       "description": "{{ object.description|safe|replace_quotes }}",
       "datePosted": "{{ object.submitted_datetime|date:'Y-m-d' }}",
