@@ -20,7 +20,7 @@ from utils.constants import HIRABLE_TECH_LIST_SLUGS
 
 from .constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from .filters import PostFilter
-from .forms import ConfirmAlertForm, CreateAlertForm
+from .forms import ConfirmAlertForm, CreateAlertForm, CreateCustomAlertForm
 from .models import Alert, AlertEmailSend, Company, Post, Technology, TechnologyMapping, Title
 from .queries import get_most_popular_technologies, get_most_popular_titles
 from .tasks import (
@@ -190,10 +190,59 @@ def create_backfill_vector_data_jobs_view(request):
     return redirect("trigger_task")
 
 
+class CreateCustomAlertView(SuccessMessageMixin, CreateView):
+    template_name = "jobs/create-custom-alert.html"
+    model = Alert
+    form_class = CreateAlertForm
+    success_url = reverse_lazy("home")
+
+    def form_valid(self, form):
+        user = self.request.user
+        existing_alerts = Alert.objects.filter(email=form.instance.email)
+
+        if user.is_authenticated:
+            form.instance.user = user
+
+        technology_id = str(Technology.objects.get(name=form.cleaned_data["technology_selected"]).id)
+
+        form.instance.filter = {"technologies": [technology_id]}
+
+        try:
+            validate_technology_selected(form.cleaned_data["technology_selected"])
+        except ValidationError:
+            messages.add_message(self.request, messages.WARNING, "Please use a Technology from the dropdown list.")
+            return redirect("home")
+
+        # if user.is_authenticated and existing_alerts.count() >= 3:
+        #     messages.add_message(self.request, messages.WARNING, "Free users can only have 3 alerts.")
+        #     return redirect("home")
+
+        if not user.is_authenticated and existing_alerts.exists():
+            messages.add_message(self.request, messages.WARNING, "Sign up to create multiple alerts.")
+            return redirect("home")
+
+        if user.is_authenticated and existing_alerts.exists():
+            if existing_alerts.latest("modified").confirmed is True:
+                form.instance.confirmed = True
+                messages.add_message(
+                    self.request, messages.SUCCESS, "Alert has been added, you will start getting jobs soon!"
+                )
+        else:
+            confirmation_url = self.request.build_absolute_uri(reverse("confirm_subscription", args=[form.instance.id]))
+            async_task(send_confirmation_email, form.cleaned_data, confirmation_url, group="Send Confirmation Email")
+            messages.add_message(
+                self.request, messages.SUCCESS, "Thank for creating an alert! Check your emails to confirm!"
+            )
+
+        async_task(find_users_to_alert, group="Find Users to Alert")
+
+        return super(AlertCreateView, self).form_valid(form)
+
+
 class AlertCreateView(SuccessMessageMixin, CreateView):
     template_name = "jobs/create-alert.html"
     model = Alert
-    form_class = CreateAlertForm
+    form_class = CreateCustomAlertForm
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
