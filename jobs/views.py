@@ -193,30 +193,20 @@ def create_backfill_vector_data_jobs_view(request):
 class CreateCustomAlertView(SuccessMessageMixin, CreateView):
     template_name = "jobs/create-custom-alert.html"
     model = Alert
-    form_class = CreateAlertForm
+    form_class = CreateCustomAlertForm
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
         user = self.request.user
-        existing_alerts = Alert.objects.filter(email=form.instance.email)
-
         if user.is_authenticated:
             form.instance.user = user
 
-        technology_id = str(Technology.objects.get(name=form.cleaned_data["technology_selected"]).id)
-
-        form.instance.filter = {"technologies": [technology_id]}
-
-        try:
-            validate_technology_selected(form.cleaned_data["technology_selected"])
-        except ValidationError:
-            messages.add_message(self.request, messages.WARNING, "Please use a Technology from the dropdown list.")
-            return redirect("home")
+        print(form.cleaned_data)
 
         # if user.is_authenticated and existing_alerts.count() >= 3:
         #     messages.add_message(self.request, messages.WARNING, "Free users can only have 3 alerts.")
         #     return redirect("home")
-
+        existing_alerts = Alert.objects.filter(email=form.instance.email)
         if not user.is_authenticated and existing_alerts.exists():
             messages.add_message(self.request, messages.WARNING, "Sign up to create multiple alerts.")
             return redirect("home")
@@ -236,7 +226,7 @@ class CreateCustomAlertView(SuccessMessageMixin, CreateView):
 
         async_task(find_users_to_alert, group="Find Users to Alert")
 
-        return super(AlertCreateView, self).form_valid(form)
+        return super(CreateCustomAlertView, self).form_valid(form)
 
 
 class AlertCreateView(SuccessMessageMixin, CreateView):
