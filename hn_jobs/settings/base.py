@@ -258,20 +258,6 @@ else:
 
 API_TOKEN = env("API_TOKEN")
 
-if DEBUG:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
-    }
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.redis.RedisCache",
-            "LOCATION": env("REDIS_URL"),
-        }
-    }
-
 MJML_BACKEND_MODE = "httpserver"
 MJML_HTTPSERVERS = [
     {
