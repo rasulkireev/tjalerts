@@ -64,7 +64,7 @@
       {% elif object.jobs.all.count >= 1 %}
       <div class="flex w-full py-2 border-b">
         <div>
-          <h2 class="text-base">Roles</h2>
+          <h2 class="text-base font-semibold">Roles</h2>
           {% for title in object.jobs.all %}
           <span
             class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
@@ -78,7 +78,7 @@
       {% if object.compensation_summary %}
       <div class="flex w-full py-2 border-b">
         <div>
-          <h2 class="text-base">Compensation Summary</h2>
+          <h2 class="text-base font-semibold">Compensation Summary</h2>
           <div class="prose max-w-none">
             <p>{{ object.compensation_summary }}</p>
           </div>
@@ -90,7 +90,7 @@
       {% elif object.technologies.all.count > 0 %}
       <div class="flex w-full py-2 border-b">
         <div>
-          <h2 class="text-base">Tech Stack</h2>
+          <h2 class="text-base font-semibold">Tech Stack</h2>
           {% for technology in object.technologies.all %}
           <span
             class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
@@ -100,17 +100,29 @@
         </div>
       </div>
       {% endif %}
+
+      {% if object.locations %}
+      <div class="flex w-full py-2 border-b">
+        <div>
+          <h2 class="text-base font-semibold">Locations</h2>
+          <div class="prose max-w-none">
+            <p>{{ object.locations }}</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
       {% if object.names_of_the_contact_person or object.emails %}
       <div class="flex w-full py-2 border-b">
         <div>
-          <h2 class="text-base">Contacts</h2>
+          <h2 class="text-base font-semibold">Contacts</h2>
           <p class="px-2 py-1 my-1 text-sm font-medium">{{ object.names_of_the_contact_person }}</p>
           <p class="px-2 py-1 my-1 text-sm font-medium">{{ object.emails }}</p>
         </div>
       </div>
       {% endif %}
       <div class="py-2">
-        <h2 class="text-base">Description</h2>
+        <h2 class="text-base font-semibold">Description</h2>
         <div class="prose max-w-none">
           <p>{{ object.description }}</p>
         </div>

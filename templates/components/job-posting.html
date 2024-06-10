@@ -53,5 +53,16 @@
           </div>
       </div>
     {% endif %}
+
+    {% if object.locations %}
+    <div class="flex w-full py-2">
+      <div>
+        <h2 class="text-base">Locations</h2>
+        <div class="prose max-w-none">
+          <p>{{ object.locations }}</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </a>
 </li>
