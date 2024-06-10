@@ -21,7 +21,6 @@ class HomeView(TemplateView):
         user = self.request.user
 
         context["latest_job_submissions"] = get_latest_submissions(9, for_homepage=True)
-        context["popular_titles"] = get_most_popular_titles()
         context["popular_technologies"] = get_most_popular_technologies(min_count=2)
         context["create_alert_form"] = CreateAlertForm
 
