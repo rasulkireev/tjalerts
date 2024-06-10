@@ -92,10 +92,7 @@
         <div>
           <h2 class="text-base font-semibold">Tech Stack</h2>
           {% for technology in object.technologies.all %}
-          <span
-            class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
-            {{ technology.name }}
-          </span>
+              {% include "components/technology-link.html" with technology=technology %}
           {% endfor %}
         </div>
       </div>
