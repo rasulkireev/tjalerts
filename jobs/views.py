@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Exists, Max, OuterRef
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -44,6 +45,21 @@ class PostListView(FilterView):
     template_name = "jobs/all_jobs.html"
     filterset_class = PostFilter
     paginate_by = 6
+
+    def get(self, request, *args, **kwargs):
+        query_params = request.GET.copy()
+        needs_redirect = False
+
+        for key in list(query_params.keys()):
+            if query_params[key] == "unknown" or query_params[key] == "":
+                del query_params[key]
+                needs_redirect = True
+
+        if needs_redirect:
+            clean_url = f"{reverse('posts')}?{query_params.urlencode()}"
+            return HttpResponseRedirect(clean_url)
+
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
