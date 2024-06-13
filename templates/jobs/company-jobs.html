@@ -10,11 +10,11 @@
 <meta name="description" content="List of jobs at {{ object_list.0.company.name }}" />
 <meta name="keywords" content="jobs, job postings, {{ object_list.0.company.name }}" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.name %}" />
+<link rel="canonical" href="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.slug %}" />
 
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Jobs at {{ object_list.0.company.name }}" />
-<meta property="og:url" content="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.name %}" />
+<meta property="og:url" content="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.slug %}" />
 <meta property="og:description" content="List of jobs at {{ object_list.0.company.name }}" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />
