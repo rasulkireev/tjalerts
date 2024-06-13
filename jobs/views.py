@@ -335,18 +335,14 @@ def toggle_subscription_from_authed_alert(request, alert_id):
 @login_required(login_url="account_login")
 def authed_weekly_digest_view(request):
     template_name = "jobs/authed_weekly_digest.html"
-    logger.info("hello")
-    print("hello")
 
     user = request.user
-    logger.info("got user", user_id=user.id)
 
     email_send = AlertEmailSend.objects.filter(user=user).latest("created")
     alerts = Alert.objects.filter(email=user.email)
 
     context = {
         "alerts": [],
-        "test": "hello",
     }
 
     for idx, alert in enumerate(alerts):

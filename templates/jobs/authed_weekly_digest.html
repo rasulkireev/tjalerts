@@ -6,12 +6,7 @@
 
 {% block content %}
 
-<p>Hello</p>
-
 <div class="md:mt-10">
-  {{ alerts }}
-  {{ test }}
-  <p>Test</p>
   {% for alert in alerts %}
   <div data-controller="reveal" class="mx-auto mb-4 max-w-7xl">
     <div class="flex flex-row items-center pb-5 space-x-2">
@@ -43,7 +38,5 @@
   </div>
   {% endfor %}
 </div>
-
-<p>Test</p>
 
 {% endblock content %}
