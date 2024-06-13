@@ -372,6 +372,40 @@ class CompanyJobsView(ListView):
         return queryset.filter(company__slug=self.kwargs.get("slug"), submitted_datetime__gte=two_months_ago)
 
 
+class TechnologyJobsView(ListView):
+    template_name = "jobs/technology-jobs.html"
+    model = Post
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+
+        return queryset.filter(technologies__slug=self.kwargs.get("slug"), submitted_datetime__gte=two_months_ago)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        tech = (
+            Technology.objects.filter(slug=self.kwargs.get("slug"))
+            .annotate(post_count=Count("posttechnology"))
+            .order_by("-post_count")
+            .first()
+        )
+
+        data = self.get_queryset()
+        dates = data.values_list("created", flat=True)
+        latest_date = max(dates)
+
+        context["tech_name"] = tech.name
+        context["tech_id"] = tech.id
+        context["tech_slug"] = tech.slug
+        context["canonical_url"] = self.request.build_absolute_uri(self.request.path).replace("http://", "https://")
+        context["latest_date"] = latest_date
+        context["create_alert_form"] = CreateAlertForm
+
+        return context
+
+
 class CompaniesJobsView(ListView):
     template_name = "jobs/companies-with-jobs.html"
     model = Company
@@ -386,6 +420,29 @@ class CompaniesJobsView(ListView):
             .annotate(has_recent_posts=Exists(recent_posts.filter(company=OuterRef("pk"))))
             .filter(has_recent_posts=True)
             .exclude(name="")
+            .order_by("name")
+        )
+
+        return queryset
+
+
+class TechnologiesJobsView(ListView):
+    template_name = "jobs/technologies-with-jobs.html"
+    model = Technology
+
+    def get_queryset(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("technologies")
+
+        queryset = (
+            super()
+            .get_queryset()
+            .exclude(name__in=EXCLUDED_TECHNOLOGIES)
+            .annotate(
+                post_count=Count("posttechnology"),
+                has_recent_posts=Exists(recent_posts.filter(technologies=OuterRef("pk"))),
+            )
+            .filter(has_recent_posts=True, post_count__gt=5)
             .order_by("name")
         )
 

@@ -6,36 +6,36 @@
 {% load date_utils %}
 
 {% block meta %}
-<title>Jobs at {{ object_list.0.company.name }}</title>
-<meta name="description" content="List of jobs at {{ object_list.0.company.name }}" />
+<title>Jobs with {{ tech_name }}</title>
+<meta name="description" content="List of jobs with {{ tech_name }}" />
 <meta name="keywords" content="jobs, job postings, {{ object_list.0.company.name }}" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.name %}" />
+<link rel="canonical" href="https://{{ request.get_host }}/{% url 'technology-jobs' tech_slug %}" />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Jobs at {{ object_list.0.company.name }}" />
-<meta property="og:url" content="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.name %}" />
-<meta property="og:description" content="List of jobs at {{ object_list.0.company.name }}" />
+<meta property="og:title" content="Jobs with {{ tech_name }}" />
+<meta property="og:url" content="https://{{ request.get_host }}/{% url 'technology-jobs' tech_slug %}" />
+<meta property="og:description" content="List of jobs with {{ tech_name }}" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@rasulkireev" />
 <meta name="twitter:site" content="@rasulkireev" />
-<meta name="twitter:title" content="Jobs at {{ object_list.0.company.name }}" />
-<meta name="twitter:description" content="List of jobs at {{ object_list.0.company.name }}" />
+<meta name="twitter:title" content="Jobs with {{ tech_name }}" />
+<meta name="twitter:description" content="List of jobs with {{ tech_name }}" />
 <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 {% endblock meta %}
 
 {% block content %}
   <div class="max-w-3xl mx-auto mb-4 text-center">
-    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ object_list.0.company.name }} Jobs</h1>
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ tech_name }} Jobs</h1>
   </div>
 
   <div class="max-w-3xl mx-auto">
     <ul role="list" class="flex flex-col space-y-2">
       {% for job in object_list %}
-        {% include "components/job-posting.html" with object=job show_name=False %}
+        {% include "components/job-posting.html" with object=job show_name=True %}
       {% endfor %}
     </ul>
   </div>
@@ -46,8 +46,8 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "{{ object_list.0.company.name }} Jobs",
-  "description": "List of job postings at {{ object_list.0.company.name }}",
+  "name": "Jobs with {{ tech_name }}",
+  "description": "List of jobs with {{ tech_name }}"",
   "itemListElement": [{% for job in object_list %}
     {
       "@type": "ListItem",
