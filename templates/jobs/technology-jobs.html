@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load markdown_extras %}
+{% load widget_tweaks %}
+{% load webpack_loader static %}
+{% load url_utils %}
+{% load date_utils %}
+
+{% block content %}
+  <div class="max-w-3xl mx-auto mb-4 text-center">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ tech_name }} Jobs</h1>
+  </div>
+
+  <div class="max-w-3xl mx-auto">
+    <ul role="list" class="flex flex-col space-y-2">
+      {% for job in object_list %}
+        {% include "components/job-posting.html" with object=job show_name=True %}
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock content %}
+
+{% block schema %}
+<script type="application/ld+json">
+</script>
+{% endblock schema %}
