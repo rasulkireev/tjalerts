@@ -37,8 +37,8 @@ urlpatterns = [
     path("<slug:slug>/highest-paid/", HighestPaidJobsView.as_view(), name="highest-paid-job-blog-post"),
     path("companies/", CompaniesJobsView.as_view(), name="companies"),
     path("<slug:slug>/", CompanyJobsView.as_view(), name="company-jobs"),
-    path("digest/<uuid:alert_email_send_id>/", unauthed_weekly_digest_view, name="unauthed_weekly_digest"),
-    path("digest/", authed_weekly_digest_view, name="authed_weekly_digest"),
+    path("digest/a", authed_weekly_digest_view, name="authed_weekly_digest"),
+    path("digest/u/<uuid:alert_email_send_id>/", unauthed_weekly_digest_view, name="unauthed_weekly_digest"),
     path(
         "unsubscribe/u/<uuid:alert_email_send_id>/", unsubscribe_from_unauthed_alert, name="unauthed_alert_unsubscribe"
     ),

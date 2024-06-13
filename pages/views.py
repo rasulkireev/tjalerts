@@ -19,6 +19,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        logger.info("got user", user_id=user.id)
 
         context["latest_job_submissions"] = get_latest_submissions(9, for_homepage=True)
         context["popular_technologies"] = get_most_popular_technologies(min_count=2)
