@@ -39,6 +39,17 @@
       {% endfor %}
     </ul>
   </div>
+
+  <div class="max-w-2xl p-6 mx-auto mt-10 border border-gray-500 rounded-md">
+    <div class="mx-auto text-center">
+        <p class="mx-auto mb-2 text-xl font-semibold text-gray-900">
+          Create your own personalized Job Alert
+        </p>
+        <div class="flex items-center justify-center">
+          {% include "components/simple-alert-form.html" with create_alert_form=create_alert_form %}
+        </div>
+    </div>
+  </div>
 {% endblock content %}
 
 {% block schema %}
