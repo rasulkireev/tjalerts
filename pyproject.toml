@@ -45,6 +45,7 @@ opentelemetry-instrumentation-logging = "^0.45b0"
 psycopg2 = "^2.9.9"
 structlog = "^24.1.0"
 django-structlog = "^8.0.0"
+tqdm = "^4.66.4"
 
 [tool.poetry.dev-dependencies]
 
