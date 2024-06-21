@@ -61,6 +61,7 @@
           <a href="{% url 'posts' %}" class="hidden text-base font-semibold md:inline text-gray-7000 hover:underline">Jobs</a>
           <a href="{% url 'companies' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Companies</a>
           <a href="{% url 'technologies' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Technologies</a>
+          <a href="{% url 'titles' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Titles</a>
         </div>
         <div class="flex lg:hidden">
           <button data-action="dropdown#toggle click@window->dropdown#hide" type="button"
@@ -147,6 +148,12 @@
                 class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 rounded-lg hover:bg-gray-50"
                 >
                   Technologies
+                </a>
+                <a
+                href="{% url 'titles' %}"
+                class="block px-3 py-2 -mx-3 text-base font-semibold leading-7 text-gray-900 rounded-lg hover:bg-gray-50"
+                >
+                  Titles
                 </a>
                 {% if user.is_authenticated %}
                 <a href="{% url 'authed_weekly_digest' %}"

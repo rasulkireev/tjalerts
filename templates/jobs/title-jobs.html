@@ -6,38 +6,49 @@
 {% load date_utils %}
 
 {% block meta %}
-<title>Jobs at {{ object_list.0.company.name }}</title>
-<meta name="description" content="List of jobs at {{ object_list.0.company.name }}" />
-<meta name="keywords" content="jobs, job postings, {{ object_list.0.company.name }}" />
+<title>Jobs with '{{ title_name }}' title</title>
+<meta name="description" content="List of jobs with '{{ title_name }}' title" />
+<meta name="keywords" content="jobs, job postings, {{ object_list.0.company.name }}, {{ title_name }}" />
 <meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.slug %}" />
+<link rel="canonical" href="https://{{ request.get_host }}/{% url 'title-jobs' title_slug %}" />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Jobs at {{ object_list.0.company.name }}" />
-<meta property="og:url" content="https://{{ request.get_host }}/{% url 'company-jobs' object_list.0.company.slug %}" />
-<meta property="og:description" content="List of jobs at {{ object_list.0.company.name }}" />
+<meta property="og:title" content="Jobs with '{{ title_name }}' title" />
+<meta property="og:url" content="https://{{ request.get_host }}/{% url 'title-jobs' title_slug %}" />
+<meta property="og:description" content="List of jobs with '{{ title_name }}' title" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@rasulkireev" />
 <meta name="twitter:site" content="@rasulkireev" />
-<meta name="twitter:title" content="Jobs at {{ object_list.0.company.name }}" />
-<meta name="twitter:description" content="List of jobs at {{ object_list.0.company.name }}" />
+<meta name="twitter:title" content="Jobs with '{{ title_name }}' title" />
+<meta name="twitter:description" content="List of jobs with '{{ title_name }}' title" />
 <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 {% endblock meta %}
 
 {% block content %}
-  <div class="max-w-3xl mx-auto mb-4 text-center">
-    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ object_list.0.company.name }} Jobs</h1>
+  <div class="mx-auto mb-4 max-w-3xl text-center">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">{{ title_name }} Jobs</h1>
   </div>
 
-  <div class="max-w-3xl mx-auto">
+  <div class="mx-auto max-w-3xl">
     <ul role="list" class="flex flex-col space-y-2">
       {% for job in object_list %}
-        {% include "components/job-posting.html" with object=job show_name=False %}
+        {% include "components/job-posting.html" with object=job show_name=True %}
       {% endfor %}
     </ul>
+  </div>
+
+  <div class="p-6 mx-auto mt-10 max-w-2xl rounded-md border border-gray-500">
+    <div class="mx-auto text-center">
+        <p class="mx-auto mb-2 text-xl font-semibold text-gray-900">
+          Create your own personalized Job Alert
+        </p>
+        <div class="flex justify-center items-center">
+          {% include "components/simple-alert-form.html" with create_alert_form=create_alert_form %}
+        </div>
+    </div>
   </div>
 {% endblock content %}
 
@@ -46,8 +57,8 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "{{ object_list.0.company.name }} Jobs",
-  "description": "List of job postings at {{ object_list.0.company.name }}",
+  "name": "Jobs with '{{ title_name }}' title",
+  "description": "List of jobs with '{{ title_name }}' title",
   "itemListElement": [{% for job in object_list %}
     {
       "@type": "ListItem",

@@ -21,7 +21,7 @@ class Post(TimeStampedModel):
     source = models.CharField(max_length=200, default="Hacker News")
 
     original_text = models.TextField(blank=True)
-    jobs = models.ManyToManyField("Title", related_name="post", blank=True, through="PostTitle")
+    titles = models.ManyToManyField("Title", related_name="post", blank=True, through="PostTitle")
     description = models.TextField(blank=True)
     levels_of_experience = models.TextField(blank=True)
     technologies = models.ManyToManyField("Technology", related_name="post", blank=True, through="PostTechnology")

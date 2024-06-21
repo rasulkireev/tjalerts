@@ -461,3 +461,61 @@ class TechnologiesJobsView(ListView):
         )
 
         return queryset
+
+
+class TitlesJobsView(ListView):
+    template_name = "jobs/titles-with-jobs.html"
+    model = Title
+
+    def get_queryset(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("titles")
+
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(
+                post_count=Count("posttitle"),
+                has_recent_posts=Exists(recent_posts.filter(titles=OuterRef("pk"))),
+            )
+            .filter(has_recent_posts=True, post_count__gt=5)
+            .order_by("name")
+        )
+
+        return queryset
+
+
+class TitleJobsView(ListView):
+    template_name = "jobs/title-jobs.html"
+    model = Post
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+
+        queryset = queryset.filter(titles__slug=self.kwargs.get("slug"), submitted_datetime__gte=two_months_ago)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        title = (
+            Title.objects.filter(slug=self.kwargs.get("slug"))
+            .annotate(post_count=Count("posttitle"))
+            .order_by("-post_count")
+            .first()
+        )
+
+        data = self.get_queryset()
+        dates = data.values_list("created", flat=True)
+        latest_date = max(dates)
+
+        context["title_name"] = title.name
+        context["title_id"] = title.id
+        context["title_slug"] = title.slug
+        context["canonical_url"] = self.request.build_absolute_uri(self.request.path).replace("http://", "https://")
+        context["latest_date"] = latest_date
+        context["create_alert_form"] = CreateAlertForm
+
+        return context

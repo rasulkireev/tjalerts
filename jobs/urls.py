@@ -11,6 +11,8 @@ from .views import (
     PostListView,
     TechnologiesJobsView,
     TechnologyJobsView,
+    TitleJobsView,
+    TitlesJobsView,
     TriggerAsyncTask,
     authed_weekly_digest_view,
     create_backfill_vector_data_jobs_view,
@@ -42,6 +44,8 @@ urlpatterns = [
     path("company/<slug:slug>/", CompanyJobsView.as_view(), name="company-jobs"),
     path("technologies/", TechnologiesJobsView.as_view(), name="technologies"),
     path("technology/<slug:slug>/", TechnologyJobsView.as_view(), name="technology-jobs"),
+    path("titles/", TitlesJobsView.as_view(), name="titles"),
+    path("title/<slug:slug>/", TitleJobsView.as_view(), name="title-jobs"),
     path(
         "unsubscribe/u/<uuid:alert_email_send_id>/", unsubscribe_from_unauthed_alert, name="unauthed_alert_unsubscribe"
     ),

@@ -60,12 +60,12 @@
         <p class="text-gray-500">Posted {{ object.submitted_datetime|timesince }} ago</p>
       </div>
 
-      {% if object.jobs.all.count == 1 and object.jobs.all.0.name == "" %}
-      {% elif object.jobs.all.count >= 1 %}
+      {% if object.titles.all.count == 1 and object.titles.all.0.name == "" %}
+      {% elif object.titles.all.count >= 1 %}
       <div class="flex w-full py-2 border-b">
         <div>
           <h2 class="text-base font-semibold">Roles</h2>
-          {% for title in object.jobs.all %}
+          {% for title in object.titles.all %}
           <span
             class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
             {{ title.name }}
@@ -144,8 +144,8 @@
     {
       "@context": "https://schema.org",
       "@type": "JobPosting",
-      "name":"{% if object.jobs %}{{ object.jobs.all.0.name }}{% else %}Developer{% endif %}",
-      "title":"{% if object.jobs %}{{ object.jobs.all.0.name }}{% else %}Developer{% endif %}",
+      "name":"{% if object.jobs %}{{ object.titles.all.0.name }}{% else %}Developer{% endif %}",
+      "title":"{% if object.jobs %}{{ object.titles.all.0.name }}{% else %}Developer{% endif %}",
       "jobLocation": {
         "@type": "Place",
         "address": {% if object.locations %}"{{ object.locations }}"{% else %}"Remote"{% endif %}

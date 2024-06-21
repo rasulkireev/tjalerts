@@ -185,7 +185,7 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
     post.save()
 
     post.technologies.add(*technologies)
-    post.jobs.add(*job_titles)
+    post.titles.add(*job_titles)
 
     logger.info("Post created.", post=post)
 
