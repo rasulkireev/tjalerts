@@ -6,7 +6,7 @@ from pgvector.django import L2Distance
 from hn_jobs.utils import get_tjalerts_logger
 
 from .models import Post, TechnologyMapping
-from .queries import get_most_popular_technologies
+from .queries import get_most_popular_technologies, get_most_popular_titles
 from .utils import get_embedding
 
 logger = get_tjalerts_logger(__name__)
@@ -38,6 +38,10 @@ class PostFilter(FilterSet):
         queryset=get_most_popular_technologies(),
         widget=forms.CheckboxSelectMultiple(),
         method="extend_technology_search",
+    )
+    titles = ModelMultipleChoiceFilter(
+        queryset=get_most_popular_titles(),
+        widget=forms.CheckboxSelectMultiple(),
     )
     compensation_summary__isempty = EmptyStringFilter(field_name="compensation_summary")
     emails__isempty = EmptyStringFilter(field_name="emails")

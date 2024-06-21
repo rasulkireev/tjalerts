@@ -15,13 +15,13 @@ def get_latest_submissions(number_of: int, for_homepage: bool = False):
         excluded_titles = Title.objects.filter(name__in=EXCLUDED_TITLES)
 
         posts = (
-            posts.annotate(num_technologies=Count("technologies"), num_jobs=Count("jobs"))
+            posts.annotate(num_technologies=Count("technologies"), num_titles=Count("titles"))
             .exclude(
                 technologies__in=excluded_tech,
-                jobs__in=excluded_titles,
+                titles__in=excluded_titles,
                 company__name="",
             )
-            .filter(num_technologies__gt=0, num_jobs__gt=0)
+            .filter(num_technologies__gt=0, num_titles__gt=0)
         )
 
     if number_of > 0:
@@ -30,13 +30,16 @@ def get_latest_submissions(number_of: int, for_homepage: bool = False):
     return posts
 
 
-def get_most_popular_titles(number_of: int = 0):
+def get_most_popular_titles(number_of: int = 0, min_count: int = 0):
     title_objects = (
         Title.objects.exclude(name__in=EXCLUDED_TITLES).annotate(post_count=Count("posttitle")).order_by("-post_count")
     )
 
     if number_of > 0:
         title_objects = title_objects[:number_of]
+
+    if min_count > 0:
+        title_objects = title_objects.filter(post_count__gt=min_count)
 
     return title_objects
 

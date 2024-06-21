@@ -80,7 +80,7 @@ def get_jobs(request, technologies=Query(None)):
         if not set(user_submitted_technologies).issubset(post_technologies):
             continue
 
-        post_titles = [title.name for title in post.jobs.all()]
+        post_titles = [title.name for title in post.titles.all()]
 
         entry = {
             "company_name": post.company.name,

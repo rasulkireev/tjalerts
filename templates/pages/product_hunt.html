@@ -7,11 +7,11 @@
 
 <div class="bg-white">
   <div class="py-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <div class="relative px-6 py-16 overflow-hidden text-center bg-gray-900 shadow-2xl isolate sm:rounded-3xl sm:px-16">
-      <h2 class="max-w-2xl mx-auto text-3xl font-bold tracking-tight text-white sm:text-4xl">
+    <div class="isolate overflow-hidden relative px-6 py-16 text-center bg-gray-900 shadow-2xl sm:rounded-3xl sm:px-16">
+      <h2 class="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">
         <span class="text-red-600">Product Hunt</span> Launch Day Special
       </h2>
-      <p class="max-w-xl mx-auto mt-6 text-lg leading-8 text-gray-300">
+      <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-300">
         Just kidding, there is no special, the product is free.
       </p>
       {# djlint:off #}
@@ -44,27 +44,27 @@
   </div>
 </div>
 
-<div class="relative px-6 isolate lg:px-8">
-  <div class="relative px-6 isolate lg:px-8">
+<div class="isolate relative px-6 lg:px-8">
+  <div class="isolate relative px-6 lg:px-8">
     <div class="mx-auto text-center">
-      <h1 class="max-w-2xl mx-auto mb-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+      <h1 class="mx-auto mb-6 max-w-2xl text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
         Personalized Job Alerts delivered
         <span class="text-green-500">directly to your inbox</span>
       </h1>
-      <div class="flex items-end justify-center mt-10 gap-x-6">
+      <div class="flex gap-x-6 justify-center items-end mt-10">
         <form action="{% url 'create-alert' %}" method="post" enctype="multipart/form-data"
           class="flex flex-row items-end space-x-1">
           {% csrf_token %}
           <div>
             <label for="email" class="block text-sm font-medium leading-6 text-left text-gray-900">Email</label>
-            {% render_field create_alert_form.email id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required="True" class="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6" %}
+            {% render_field create_alert_form.email id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required="True" class="block px-2 py-1.5 w-full text-gray-900 rounded-md border-0 ring-1 ring-inset ring-gray-300 shadow-sm placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6" %}
           </div>
 
           <div>
             <label for="technology_selected"
               class="block text-sm font-medium leading-6 text-left text-gray-900">Tech</label>
             <div>
-              {% render_field create_alert_form.technology_selected list="job-technologies" id="technology_selected" name="technology_selected" type="text" placeholder="Select from the list" required="True" class="block w-full px-2 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6" %}
+              {% render_field create_alert_form.technology_selected list="job-technologies" id="technology_selected" name="technology_selected" type="text" placeholder="Select from the list" required="True" class="block px-2 py-1.5 w-full text-gray-900 rounded-md border-0 ring-1 ring-inset ring-gray-300 shadow-sm placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6" %}
               <datalist id="job-technologies">
                 {% for object in popular_technologies %}
                 <option value="{{ object.name }}"></option>
@@ -89,14 +89,14 @@
   </div>
 </div>
 
-<div class="mx-auto mt-16 overflow-hidden sm:mt-24 max-w-7xl">
+<div class="overflow-hidden mx-auto mt-16 max-w-7xl sm:mt-24">
   <h2 class="mb-2 text-2xl font-semibold leading-6 text-center text-gray-900">Companies looking for employees...</h2>
   <ul role="list" class="grid grid-cols-1 gap-6 py-2 sm:grid-cols-2 lg:grid-cols-3">
     {% for object in latest_job_submissions %}
-    {% if object.technologies.all.count > 0 or object.jobs.all.count > 0 %}
-    <li class="col-span-1 bg-white border border-gray-100 rounded-lg shadow hover:bg-gray-50">
-      <a class="divide-y divide-gray-200 rounded-lg" href="{% url 'post' object.id %}">
-        <div class="flex items-center justify-between w-full px-4 py-2 space-x-6">
+    {% if object.technologies.all.count > 0 or object.titles.all.count > 0 %}
+    <li class="col-span-1 bg-white rounded-lg border border-gray-100 shadow hover:bg-gray-50">
+      <a class="rounded-lg divide-y divide-gray-200" href="{% url 'post' object.id %}">
+        <div class="flex justify-between items-center px-4 py-2 space-x-6 w-full">
           <div class="flex-1 truncate">
             <div class="flex items-center space-x-3">
               <h3 class="text-lg font-medium text-gray-900 truncate">
@@ -106,14 +106,14 @@
           </div>
         </div>
 
-        {% if object.jobs.all.count > 0 %}
-        <div class="flex w-full px-4 py-1 -mt-px divide-x divide-gray-200">
+        {% if object.titles.all.count > 0 %}
+        <div class="flex px-4 py-1 -mt-px w-full divide-x divide-gray-200">
           <div class="flex flex-1 w-0">
             <div class="my-2">
               <h4 class="text-sm">Roles</h4>
-              {% for title in object.jobs.all %}
+              {% for title in object.titles.all %}
               <span
-                class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
+                class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 bg-green-50 rounded-md ring-1 ring-inset ring-green-600/20">
                 {{ title.name }}
               </span>
               {% endfor %}
@@ -123,13 +123,13 @@
         {% endif %}
 
         {% if object.technologies.all.count > 0 %}
-        <div class="flex w-full px-4 py-1 -mt-px divide-x divide-gray-200">
+        <div class="flex px-4 py-1 -mt-px w-full divide-x divide-gray-200">
           <div class="flex flex-1 w-0">
             <div class="my-2">
               <h4 class="text-sm">Tech Stack</h4>
               {% for technology in object.technologies.all %}
               <span
-                class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
+                class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 bg-green-50 rounded-md ring-1 ring-inset ring-green-600/20">
                 {{ technology.name }}
               </span>
               {% endfor %}
@@ -144,11 +144,11 @@
   </ul>
 </div>
 
-<div class="mx-auto mt-4 mb-16 text-right max-w-7xl">
+<div class="mx-auto mt-4 mb-16 max-w-7xl text-right">
   <a href="{% url 'posts' %}"
-    class="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+    class="inline-flex items-center px-6 py-3 text-base font-medium text-white bg-green-600 rounded-md border border-transparent shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
     See more jobs
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 ml-3 -mr-1 2-5" fill="none" viewBox="0 0 24 24"
+    <svg xmlns="http://www.w3.org/2000/svg" class="-mr-1 ml-3 w-6 h-6 2-5" fill="none" viewBox="0 0 24 24"
       stroke="currentColor" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
         d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z" />

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load markdown_extras %}
+{% load widget_tweaks %}
+{% load webpack_loader static %}
+{% load url_utils %}
+
+{% block meta %}
+<title>Tech Job Titles that are in demand right now.</title>
+<meta name="description" content="List of Tech Job Titles that are in demand right now." />
+<meta name="keywords" content="job titles, hiring, jobs" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://{{ request.get_host }}/{% url 'titles' %}" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Tech Job Titles that are in demand right now." />
+<meta property="og:url" content="https://{{ request.get_host }}/{% url 'titles' %}" />
+<meta property="og:description" content="List of Tech Job Titles that are in demand right now." />
+<meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="@rasulkireev" />
+<meta name="twitter:site" content="@rasulkireev" />
+<meta name="twitter:title" content="Tech Job Titles that are in demand right now." />
+<meta name="twitter:description" content="List of Tech Job Titles that are in demand right now." />
+<meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+{% endblock meta %}
+
+{% block content %}
+<div class="px-4 mx-auto space-y-10 max-w-7xl sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-2xl text-center">
+    <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Tech tobs titles that are in demand right now.</h1>
+  </div>
+  <div class="mx-auto max-w-xl">
+    <ul role="list" class="ml-2 list-disc list-inside">
+      {% for title in object_list %}
+      <li class="mb-2">
+        <a href="{% url 'title-jobs' title.slug %}" class="text-lg font-semibold leading-6 text-gray-900 link">
+            {{ title.name }}
+        </a>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock content %}
+
+{% block schema %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Tech Job Titles that are in demand right now.",
+  "description": "List of tech jobs titles that are in demand",
+  "itemListElement": [{% for title in object_list %}
+    {
+      "@type": "ListItem",
+      "position": {{ forloop.counter }},
+      "url": "https://{{ request.get_host }}{% url 'title-jobs' title.slug %}",
+      "item": {
+        "@type": "Organization",
+        "name": "{{ title.name }}"
+      }
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}]
+}
+</script>
+{% endblock schema %}
