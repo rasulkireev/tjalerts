@@ -34,6 +34,7 @@ class EmptyStringFilter(BooleanFilter):
 class PostFilter(FilterSet):
     vector = VectorEmbeddingFilter(field_name="vector")
     locations = CharFilter(lookup_expr="icontains")
+    # technology_selected = CharFilter(max_length=100)
     technologies = ModelMultipleChoiceFilter(
         queryset=get_most_popular_technologies(),
         widget=forms.CheckboxSelectMultiple(),
