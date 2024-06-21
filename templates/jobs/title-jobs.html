@@ -6,24 +6,24 @@
 {% load date_utils %}
 
 {% block meta %}
-<title>Jobs with '{{ title_name }}' title</title>
-<meta name="description" content="List of jobs with '{{ title_name }}' title" />
+<title>'{{ title_name }}' jobs</title>
+<meta name="description" content="List of '{{ title_name }}' jobs" />
 <meta name="keywords" content="jobs, job postings, {{ object_list.0.company.name }}, {{ title_name }}" />
 <meta name="robots" content="index, follow" />
 <link rel="canonical" href="https://{{ request.get_host }}/{% url 'title-jobs' title_slug %}" />
 
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Jobs with '{{ title_name }}' title" />
+<meta property="og:title" content="'{{ title_name }}' jobs" />
 <meta property="og:url" content="https://{{ request.get_host }}/{% url 'title-jobs' title_slug %}" />
-<meta property="og:description" content="List of jobs with '{{ title_name }}' title" />
+<meta property="og:description" content="List of '{{ title_name }}' jobs" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />
 
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@rasulkireev" />
 <meta name="twitter:site" content="@rasulkireev" />
-<meta name="twitter:title" content="Jobs with '{{ title_name }}' title" />
-<meta name="twitter:description" content="List of jobs with '{{ title_name }}' title" />
+<meta name="twitter:title" content="'{{ title_name }}' jobs" />
+<meta name="twitter:description" content="List of '{{ title_name }}' jobs" />
 <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 {% endblock meta %}
 
@@ -57,8 +57,8 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "Jobs with '{{ title_name }}' title",
-  "description": "List of jobs with '{{ title_name }}' title",
+  "name": "'{{ title_name }}' jobs",
+  "description": "List of '{{ title_name }}' jobs",
   "itemListElement": [{% for job in object_list %}
     {
       "@type": "ListItem",

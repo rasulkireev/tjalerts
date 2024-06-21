@@ -1,12 +1,11 @@
-from datetime import timedelta
-
 from django.contrib import sitemaps
 from django.contrib.sitemaps import GenericSitemap
-from django.db.models import Count, Max
+from django.db.models import Count, Exists, Max, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 
-from jobs.models import Company, Post, Technology
+from jobs.constants import EXCLUDED_TECHNOLOGIES
+from jobs.models import Company, Post, Technology, Title
 from utils.constants import HIRABLE_TECH_LIST_SLUGS
 
 
@@ -18,6 +17,8 @@ class StaticViewSitemap(sitemaps.Sitemap):
         return [
             "home",
             "companies",
+            "technologies",
+            "titles",
         ]
 
     def location(self, item):
@@ -50,10 +51,13 @@ class CompaniesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("company")
+
         companies_with_recent_posts = (
-            Company.objects.filter(post__created__gte=timezone.now() - timedelta(days=60))
-            .annotate(num_posts=Count("post"))
-            .filter(num_posts__gt=0)
+            Company.objects.annotate(has_recent_posts=Exists(recent_posts.filter(company=OuterRef("pk"))))
+            .filter(has_recent_posts=True)
+            .exclude(name="")
             .distinct()
         )
         return companies_with_recent_posts
@@ -65,11 +69,66 @@ class CompaniesJobsListicleSitemap(sitemaps.Sitemap):
         return reverse("company-jobs", kwargs={"slug": obj.slug})
 
 
+class TechnologiesJobsListicleSitemap(sitemaps.Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
+    protocol = "https"
+
+    def items(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("technologies")
+
+        technologies_with_recent_posts = (
+            Technology.objects.exclude(name__in=EXCLUDED_TECHNOLOGIES)
+            .annotate(
+                post_count=Count("posttechnology"),
+                has_recent_posts=Exists(recent_posts.filter(technologies=OuterRef("pk"))),
+            )
+            .filter(has_recent_posts=True, post_count__gt=0)
+            .distinct()
+        )
+        return technologies_with_recent_posts
+
+    def lastmod(self, obj):
+        return Post.objects.filter(technologies=obj).aggregate(latest_date=Max("submitted_datetime"))["latest_date"]
+
+    def location(self, obj):
+        return reverse("technology-jobs", kwargs={"slug": obj.slug})
+
+
+class TitlesJobsListicleSitemap(sitemaps.Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
+    protocol = "https"
+
+    def items(self):
+        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("titles")
+
+        titles_with_recent_posts = (
+            Title.objects.annotate(
+                post_count=Count("posttitle"),
+                has_recent_posts=Exists(recent_posts.filter(titles=OuterRef("pk"))),
+            )
+            .filter(has_recent_posts=True, post_count__gt=0)
+            .distinct()
+        )
+        return titles_with_recent_posts
+
+    def lastmod(self, obj):
+        return Post.objects.filter(titles=obj).aggregate(latest_date=Max("submitted_datetime"))["latest_date"]
+
+    def location(self, obj):
+        return reverse("title-jobs", kwargs={"slug": obj.slug})
+
+
 sitemaps = {
     "sitemaps": {
         "static": StaticViewSitemap,
         "highest_paid_jobs_listicle": HighestPaidJobsListicleSitemap,
         "company_jobs": CompaniesJobsListicleSitemap,
+        "technology_jobs": TechnologiesJobsListicleSitemap,
+        "title_jobs": TitlesJobsListicleSitemap,
         "posts": GenericSitemap(
             {
                 "queryset": Post.objects.all(),
