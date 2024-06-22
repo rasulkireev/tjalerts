@@ -62,7 +62,8 @@ class Post(TimeStampedModel):
     class Meta:
         ordering = ("-submitted_datetime",)
         indexes = [
-            HnswIndex(name="vector_index", fields=["vector"], m=16, ef_construction=64, opclasses=["vector_l2_ops"])
+            HnswIndex(name="vector_index", fields=["vector"], m=16, ef_construction=64, opclasses=["vector_l2_ops"]),
+            models.Index(fields=["who_is_hiring_comment_id"], name="index_who_is_hiring_comment_id"),
         ]
 
 
@@ -122,11 +123,9 @@ class Company(TimeStampedModel):
 
     class Meta:
         indexes = [
-            models.Index(
-                fields=[
-                    "name",
-                ]
-            ),
+            models.Index(fields=["name"], name="index_company_name"),
+            models.Index(fields=["emails"], name="index_company_emails"),
+            models.Index(fields=["company_homepage_link"], name="index_company_homepage_link"),
         ]
 
 
@@ -140,17 +139,29 @@ class Email(TimeStampedModel):
     post = models.ForeignKey("Post", related_name="email", on_delete=models.CASCADE)
     is_approved = models.BooleanField(default=False)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=["email"], name="index_email"),
+            models.Index(fields=["email_is_valid", "email_is_generic", "is_approved"], name="index_email_flags"),
+        ]
+
 
 class PostTitle(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
 
+    class Meta:
+        indexes = [models.Index(fields=["post_id", "title_id"], name="index_post_id_title_id")]
+
 
 class PostTechnology(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     technology = models.ForeignKey(Technology, on_delete=models.CASCADE)
+
+    class Meta:
+        indexes = [models.Index(fields=["post_id", "technology_id"], name="index_post_id_technology_id")]
 
 
 class Alert(BaseModel):
