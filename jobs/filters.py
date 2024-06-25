@@ -68,7 +68,7 @@ class PostFilter(FilterSet):
 
             logger.info(
                 "Filtering by all techologies",
-                selected_technologies=selected_technologies,
+                selected_technologies=[t.name for t in selected_technologies],
                 count_of_selected_technologies=len(selected_technologies),
                 count_of_all_related_techologies=len(selected_technology_ids),
                 duration=round(time.time() - start_time, 2),
