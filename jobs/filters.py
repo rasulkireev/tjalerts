@@ -1,3 +1,5 @@
+import time
+
 from django import forms
 from django.core.validators import EMPTY_VALUES
 from django_filters import BooleanFilter, CharFilter, Filter, FilterSet, ModelMultipleChoiceFilter, OrderingFilter
@@ -55,6 +57,7 @@ class PostFilter(FilterSet):
 
     def extend_technology_search(self, queryset, name, selected_technologies):
         if selected_technologies:
+            start_time = time.time()
             selected_technology_ids = [tech.id for tech in selected_technologies]
             child_technology_ids = list(
                 TechnologyMapping.objects.filter(parent_id__in=selected_technology_ids).values_list(
@@ -65,8 +68,10 @@ class PostFilter(FilterSet):
 
             logger.info(
                 "Filtering by all techologies",
+                selected_technologies=selected_technologies,
                 count_of_selected_technologies=len(selected_technologies),
                 count_of_all_related_techologies=len(selected_technology_ids),
+                duration=round(time.time() - start_time, 2),
             )
 
             return queryset.filter(technologies__id__in=selected_technology_ids).distinct()
@@ -82,9 +87,9 @@ class PostFilter(FilterSet):
             "locations",
         ]
 
-    @property
-    def qs(self):
-        return super().qs.exclude(description__exact="")
+    # @property
+    # def qs(self):
+    #     return super().qs.exclude(description__exact="")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
