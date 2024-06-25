@@ -87,9 +87,9 @@ class PostFilter(FilterSet):
             "locations",
         ]
 
-    # @property
-    # def qs(self):
-    #     return super().qs.exclude(description__exact="")
+    @property
+    def qs(self):
+        return super().qs.exclude(description__exact="")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
