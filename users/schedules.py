@@ -31,4 +31,11 @@ schedules = [
         "args": "",
         "type": Schedule.DAILY,
     },
+    {
+        "name": "Run Vacuum and Analyze on DB",
+        "func_path": "utils.tasks.vacuum_analyze",
+        "hook": "jobs.hooks.print_result",
+        "args": "",
+        "type": Schedule.DAILY,
+    },
 ]
