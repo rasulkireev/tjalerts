@@ -6,35 +6,35 @@
 {% load url_utils %}
 
 {% block meta %}
-<title>Tech Job Post - {{ object.company.name }}</title>
+<title>{{ object.company.name }} is hiring - {{ object.created | date:"F Y" }}</title>
 <meta name="description" content="{{ object.description }}" />
 <link rel="canonical" href="https://{{ request.get_host }}/jobs/{{ object.id }}" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@rasulkireev" />
-<meta name="twitter:title" content="Tech Job Post - {{ object.company.name }}" />
+<meta name="twitter:title" content="{{ object.company.name }} is hiring - {{ object.created | date:"F Y" }}" />
 <meta name="twitter:description" content="{{ object.description }}" />
 <meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
-<meta property="og:title" content="Tech Job Post - {{ object.company.name }}" />
+<meta property="og:title" content="{{ object.company.name }} is hiring - {{ object.created | date:"F Y" }}" />
 <meta property="og:url" content="https://{{ request.get_host }}/jobs/{{ object.id }}" />
 <meta property="og:description" content="{{ object.description }}" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 {% endblock meta %}
 
 {% block content %}
-<main class="max-w-4xl mx-auto mt-16 overflow-hidden">
+<main class="overflow-hidden mx-auto mt-16 max-w-4xl">
     <div>
-      <div class="flex items-end justify-between pb-2 border-b">
+      <div class="flex justify-between items-end pb-2 border-b">
         <div class="flex flex-col">
           <div class="flex items-center space-x-3">
-            <h3 class="text-lg font-medium text-gray-900 truncate">
+            <h1 class="text-lg font-medium text-gray-900 truncate">
               <a href="{% url 'post' object.id %}">
                 {% if object.company.name %}
                   {{ object.company.name }}
                 {% else %}
-                  Stealth
+                  Stealth Company
                 {% endif %}
               </a>
-            </h3>
+            </h1>
             {% if object.company.company_homepage_link %}
             <a href="{{ object.company.fixed_company_homepage_link }}" target="_blank">
               <img class="w-4 h-4" src="{% static 'vendors/images/external_link.svg' %}" alt="External Link" />
@@ -62,12 +62,12 @@
 
       {% if object.titles.all.count == 1 and object.titles.all.0.name == "" %}
       {% elif object.titles.all.count >= 1 %}
-      <div class="flex w-full py-2 border-b">
+      <div class="flex py-2 w-full border-b">
         <div>
           <h2 class="text-base font-semibold">Roles</h2>
           {% for title in object.titles.all %}
           <span
-            class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 rounded-md bg-green-50 ring-1 ring-inset ring-green-600/20">
+            class="inline-flex items-center px-2 py-1 my-1 text-sm font-medium text-green-700 bg-green-50 rounded-md ring-1 ring-inset ring-green-600/20">
             {{ title.name }}
           </span>
           {% endfor %}
@@ -76,10 +76,10 @@
       {% endif %}
 
       {% if object.compensation_summary %}
-      <div class="flex w-full py-2 border-b">
+      <div class="flex py-2 w-full border-b">
         <div>
           <h2 class="text-base font-semibold">Compensation Summary</h2>
-          <div class="prose max-w-none">
+          <div class="max-w-none prose">
             <p>{{ object.compensation_summary }}</p>
           </div>
         </div>
@@ -88,7 +88,7 @@
 
       {% if object.technologies.all.count == 1 and object.technologies.all.0.name == "" %}
       {% elif object.technologies.all.count > 0 %}
-      <div class="flex w-full py-2 border-b">
+      <div class="flex py-2 w-full border-b">
         <div>
           <h2 class="text-base font-semibold">Tech Stack</h2>
           {% for technology in object.technologies.all %}
@@ -99,10 +99,10 @@
       {% endif %}
 
       {% if object.locations %}
-      <div class="flex w-full py-2 border-b">
+      <div class="flex py-2 w-full border-b">
         <div>
           <h2 class="text-base font-semibold">Locations</h2>
-          <div class="prose max-w-none">
+          <div class="max-w-none prose">
             <p>{{ object.locations }}</p>
           </div>
         </div>
@@ -110,7 +110,7 @@
       {% endif %}
 
       {% if object.names_of_the_contact_person or object.emails %}
-      <div class="flex w-full py-2 border-b">
+      <div class="flex py-2 w-full border-b">
         <div>
           <h2 class="text-base font-semibold">Contacts</h2>
           <p class="px-2 py-1 my-1 text-sm font-medium">{{ object.names_of_the_contact_person }}</p>
@@ -120,18 +120,18 @@
       {% endif %}
       <div class="py-2">
         <h2 class="text-base font-semibold">Description</h2>
-        <div class="prose max-w-none">
+        <div class="max-w-none prose">
           <p>{{ object.description }}</p>
         </div>
       </div>
     </div>
 
-    <div class="max-w-2xl p-6 mx-auto mt-10 border border-gray-500 rounded-md">
+    <div class="p-6 mx-auto mt-10 max-w-2xl rounded-md border border-gray-500">
       <div class="mx-auto text-center">
           <p class="mx-auto mb-2 text-xl font-semibold text-gray-900">
             Create your own personalized Job Alert
           </p>
-          <div class="flex items-center justify-center">
+          <div class="flex justify-center items-center">
             {% include "components/simple-alert-form.html" with create_alert_form=create_alert_form %}
           </div>
       </div>

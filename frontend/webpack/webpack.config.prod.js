@@ -2,6 +2,7 @@ const Webpack = require("webpack");
 const { merge } = require("webpack-merge");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const common = require("./webpack.common.js");
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
@@ -19,6 +20,7 @@ module.exports = merge(common, {
       filename: "css/[name].[contenthash].css",
       chunkFilename: "css/[id].[contenthash].css",
     }),
+    new CompressionPlugin(),
   ],
   module: {
     rules: [

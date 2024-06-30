@@ -4,6 +4,7 @@ const { merge } = require("webpack-merge");
 const StylelintPlugin = require("stylelint-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
 
 const common = require("./webpack.common.js");
 
@@ -44,6 +45,13 @@ module.exports = merge(common, {
     new MiniCssExtractPlugin({
       filename: "css/[name].css",
       chunkFilename: "css/[id].css",
+    }),
+    new CompressionPlugin({
+      filename: "[path][base].gz",
+      algorithm: "gzip",
+      test: /\.(js|css|html|svg)$/,
+      threshold: 8192,
+      minRatio: 0.8,
     }),
   ],
   module: {
