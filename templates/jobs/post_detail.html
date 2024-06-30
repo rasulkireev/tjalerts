@@ -7,6 +7,9 @@
 
 {% block meta %}
 <title>{{ object.company.name }} is hiring - {{ object.created | date:"F Y" }}</title>
+{% if is_old %}
+<meta name="robots" content="noindex" />
+{% endif %}
 <meta name="description" content="{{ object.description }}" />
 <link rel="canonical" href="https://{{ request.get_host }}/jobs/{{ object.id }}" />
 <meta name="twitter:card" content="summary" />
