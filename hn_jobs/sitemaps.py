@@ -131,7 +131,7 @@ sitemaps = {
         "title_jobs": TitlesJobsListicleSitemap,
         "posts": GenericSitemap(
             {
-                "queryset": Post.objects.all(),
+                "queryset": Post.objects.filter(created__gte=timezone.now() - timezone.timedelta(days=60)),
                 "date_field": "modified",
             },
             priority=0.7,

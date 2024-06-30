@@ -88,6 +88,7 @@ class PostDetailView(DetailView):
             add_users_context(context, user, self)
 
         context["create_alert_form"] = CreateAlertForm
+        context["is_old"] = self.object.created < timezone.now() - timedelta(days=60)
 
         return context
 
