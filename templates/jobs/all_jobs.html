@@ -52,14 +52,14 @@
 
     <form method="get">
         <div data-controller="dropdown" class="py-2">
-          <div class="flex flex-row justify-between">
+          <div data-dropdown-target="menu" class="flex flex-row justify-between">
             <label class="font-medium text-gray-900">Sort by</label>
           </div>
           <div class="my-2">
             {% render_field filter.form.o id="order" name="order" class="block py-1.5 pr-10 pl-3 -mt-1 w-full text-gray-900 rounded border-0 ring-1 ring-inset ring-gray-200 focus:ring-2 focus:ring-blue-600 sm:text-sm sm:leading-6" %}
           </div>
         </div>
-        <div data-controller="dropdown" class="py-2">
+        <div class="py-2">
           <div class="flex flex-row justify-between">
             <label class="font-medium text-gray-900">Search</label>
           </div>
@@ -115,41 +115,14 @@
                 type="text"
                 id="search-technologies"
                 data-filter-target="query"
-                data-action="input->filter#search"
+                data-action="input->select-technology#search"
                 placeholder="Search technologies..."
                 class="p-1 mt-1 w-full rounded"
               />
             </div>
             <div class="px-2" data-select-technology-target="selected"></div>
-            <div class="overflow-auto px-2 mt-2 max-h-64 rounded border border-gray-200">
-                {% render_field filter.form.technologies id="technologies" name="technologies" class="my-2 text-gray-600 rounded" data-filter-target="item" data-select-technology-target="item" data-action="click->select-technology#select" %}
-            </div>
-          </div>
-        </div>
-
-        <div data-controller="reveal select-title" class="py-2">
-          <div class="flex flex-row justify-between p-2 rounded-md hover:bg-slate-100" data-action="click->reveal#toggle">
-            <label for="titles_used" class="font-medium text-gray-900">Titles</label>
-            <button type="button" class="p-1 rounded-full hover:bg-gray-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </button>
-          </div>
-          <div class="hidden" data-controller="filter" data-reveal-target="item">
-            <div>
-              <input
-                type="text"
-                id="search-titles"
-                data-filter-target="query"
-                data-action="input->filter#search"
-                placeholder="Search titles..."
-                class="p-1 mt-1 w-full rounded"
-              />
-            </div>
-            <div class="px-2" data-select-title-target="selected"></div>
-            <div class="overflow-auto px-2 mt-2 max-h-64 rounded border border-gray-200">
-                {% render_field filter.form.titles id="titles" name="titles" class="my-2 text-gray-600 rounded" data-filter-target="item" data-select-title-target="item" data-action="click->select-title#select" %}
+            <div class="overflow-auto px-2 mt-2 max-h-64 rounded border border-gray-200" data-select-technology-target="results">
+              <!-- Results will be dynamically inserted here -->
             </div>
           </div>
         </div>

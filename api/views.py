@@ -1,26 +1,19 @@
-from typing import List
+from typing import List, Optional
 
-from django.conf import settings
+from django.db.models import Count, Q
 from django_q.tasks import async_task
 from ninja import NinjaAPI, Query
-from ninja.security import HttpBearer
 
 from hn_jobs.utils import get_tjalerts_logger
-from jobs.models import Company, Email, Post
+from jobs.models import Company, Email, Post, Technology
 from jobs.tasks import create_valid_emails
 
-from .schemas import ReadCompany, ReadEmails
+from .schemas import ReadCompany, ReadEmails, TechnologySchema
 
 logger = get_tjalerts_logger(__name__)
 
 
-class GlobalAuth(HttpBearer):
-    def authenticate(self, request, token):
-        if token == settings.API_TOKEN:
-            return token
-
-
-api = NinjaAPI(auth=GlobalAuth())
+api = NinjaAPI()
 
 
 @api.get("/companies", response=List[ReadCompany])
@@ -104,3 +97,20 @@ def get_jobs(request, technologies=Query(None)):
         "count": len(posts_list),
         "jobs": posts_list,
     }
+
+
+@api.get("/technologies/search", response=List[TechnologySchema])
+def search_technologies(request, query: Optional[str] = Query(None, min_length=2)):
+    if query:
+        technologies = (
+            Technology.objects.filter(Q(name__icontains=query) | Q(slug__icontains=query))
+            .annotate(post_count=Count("posttechnology"))
+            .order_by("-post_count")[:20]
+        )  # Limit to 20 results, ordered by post count
+    else:
+        technologies = Technology.objects.none()
+
+    return [
+        TechnologySchema(id=str(tech.id), name=tech.name, slug=tech.slug, post_count=tech.post_count)
+        for tech in technologies
+    ]

@@ -32,3 +32,10 @@ class ReadEmails(Schema):
 # class ReadPosts(Schema):
 #     count: int
 #     posts: List[ReadPost]
+
+
+class TechnologySchema(Schema):
+    id: str
+    name: str
+    slug: str
+    post_count: int
