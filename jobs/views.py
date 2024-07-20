@@ -9,7 +9,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Count, Exists, Max, OuterRef, Subquery
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -49,6 +49,11 @@ class PostListView(FilterView):
     def get(self, request, *args, **kwargs):
         query_params = request.GET.copy()
         needs_redirect = False
+
+        filterset_class = self.get_filterset_class()
+        filterset = self.get_filterset(filterset_class)
+
+        logger.info("Filterset", filters=filterset.form.data)
 
         for key in list(query_params.keys()):
             if query_params[key] == "unknown" or query_params[key] == "":
@@ -361,8 +366,10 @@ def authed_weekly_digest_view(request):
     }
 
     for idx, alert in enumerate(alerts):
-        post_filter = PostFilter(alert.filter)
-        queryset = post_filter.qs.filter(submitted_datetime__gte=email_send.created - timedelta(days=7))
+        query_dict = QueryDict("", mutable=True)
+        query_dict.update(alert.filter)
+        post_filter = PostFilter(query_dict)
+        queryset = post_filter.qs.filter(submitted_datetime__gte=email_send.created - timedelta(days=31))
 
         name = default_alert_name(alert, idx)
 
