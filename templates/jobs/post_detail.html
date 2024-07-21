@@ -129,13 +129,13 @@
       </div>
     </div>
 
-    <h3 class="mt-4 text-lg font-medium text-gray-900">Similar Jobs</h3>
-    <div class="mb-4 rounded-md border border-gray-200">
-      {% for similar_post in similar_posts %}
-          <ul role="list" class="flex flex-col divide-y divide-gray-200">
-            {% include "components/small-job-posting.html" with object=similar_post %}
-          </ul>
-      {% endfor %}
+    <div data-controller="similar-posts" data-similar-posts-post-id-value="{{ post.id }}">
+      <h2 class="mt-4 text-lg font-medium text-gray-900">Similar Jobs</h2>
+      <div class="mb-4 rounded-md border border-gray-200">
+        <ul data-similar-posts-target="container" role="list" class="flex flex-col divide-y divide-gray-200">
+          <!-- Similar posts will be inserted here -->
+        </ul>
+      </div>
     </div>
 
     <div class="p-6 mx-auto mt-10 max-w-2xl rounded-md border border-gray-500">

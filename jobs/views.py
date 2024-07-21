@@ -22,7 +22,6 @@ from jobs.constants import EXCLUDED_TECHNOLOGIES, EXCLUDED_TITLES
 from jobs.filters import PostFilter
 from jobs.forms import ConfirmAlertForm, CreateAlertForm, CreateCustomAlertForm
 from jobs.models import Alert, AlertEmailSend, Company, Post, Technology, TechnologyMapping, Title
-from jobs.queries import get_similar_posts
 from jobs.tasks import (
     add_email_to_buttondown,
     create_backfill_vector_data_jobs,
@@ -91,7 +90,6 @@ class PostDetailView(DetailView):
 
         context["create_alert_form"] = CreateAlertForm
         context["is_old"] = self.object.created < timezone.now() - timedelta(days=60)
-        context["similar_posts"] = get_similar_posts(self.object)
 
         return context
 

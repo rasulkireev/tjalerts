@@ -90,7 +90,7 @@ def get_weekly_jobs_for_a_subscriber(subscriber: Subscriber) -> str:
     ).distinct()
 
 
-def get_similar_posts(post, limit=5):
+def get_similar_posts_from_db(post, limit=5):
     start_time = time.time()
 
     excluded_posts = Q(id=post.id) | Q(company=post.company)

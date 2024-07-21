@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from ninja import Schema
@@ -39,3 +40,26 @@ class TechnologySchema(Schema):
     name: str
     slug: str
     post_count: int
+
+
+class TitleSchema(Schema):
+    id: str
+    name: str
+    slug: str
+    post_count: int
+
+
+class CompanySchema(Schema):
+    id: str
+    name: str
+
+
+class PostSchema(Schema):
+    id: str
+    description: str
+    created_at: datetime
+    company: CompanySchema
+
+
+class SimilarPostsResponse(Schema):
+    similar_posts: List[PostSchema]
