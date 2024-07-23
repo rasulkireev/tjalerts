@@ -14,7 +14,7 @@
 
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Jobs with {{ tech_name }}" />
-<meta property="og:url" content="https://{{ request.get_host }}/{% url 'technology-jobs' tech_slug %}" />
+<meta property="og:url" content="https://{{ request.get_host }}{% url 'technology-jobs' tech_slug %}" />
 <meta property="og:description" content="List of jobs with {{ tech_name }}" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />

@@ -53,6 +53,7 @@ export default class extends Controller {
   }
 
 
+
   addItem(event) {
     const id = event.currentTarget.dataset.id;
     const name = event.currentTarget.dataset.name;

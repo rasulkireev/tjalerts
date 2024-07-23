@@ -14,7 +14,7 @@
 
 <meta property="og:type" content="website" />
 <meta property="og:title" content="'{{ title_name }}' jobs" />
-<meta property="og:url" content="https://{{ request.get_host }}/{% url 'title-jobs' title_slug %}" />
+<meta property="og:url" content="https://{{ request.get_host }}{% url 'title-jobs' title_slug %}" />
 <meta property="og:description" content="List of '{{ title_name }}' jobs" />
 <meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
 <meta property="og:locale" content="en_US" />
