@@ -19,6 +19,8 @@ class StaticViewSitemap(sitemaps.Sitemap):
             "companies",
             "technologies",
             "titles",
+            "blog-posts",
+            "posts",
         ]
 
     def location(self, item):
