@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db import models
 from django.db.models import Count, Exists, Max, OuterRef, Subquery
 from django.http import HttpResponseRedirect, QueryDict
@@ -31,7 +32,13 @@ from jobs.tasks import (
     get_hn_pages_to_analyze,
     send_confirmation_email,
 )
-from jobs.utils import default_alert_name, is_email_confirmed, remove_params_for_filters
+from jobs.utils import (
+    default_alert_name,
+    generate_job_search_keywords,
+    generate_job_search_title,
+    is_email_confirmed,
+    remove_params_for_filters,
+)
 from utils.constants import HIRABLE_TECH_LIST_SLUGS
 
 logger = get_tjalerts_logger(__name__)
@@ -64,6 +71,21 @@ class PostListView(FilterView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        filtered_qs = self.filterset.qs
+        date = timezone.now().strftime("%B %Y")
+
+        paginator = Paginator(filtered_qs, self.paginate_by)
+        page_number = self.request.GET.get("page", 1)
+        page = paginator.get_page(page_number)
+
+        first_item_datetime = timezone.now()
+        if page.object_list:
+            first_item = page.object_list[0]
+            first_item_datetime = first_item.submitted_datetime
+
+        title = generate_job_search_title(self.request.GET, first_item_datetime)
+        keywords = generate_job_search_keywords(self.request.GET)
+
         user = self.request.user
         if user.is_authenticated:
             add_users_context(context, user, self)
@@ -73,6 +95,9 @@ class PostListView(FilterView):
 
         context["CustomAlertForm"] = CreateCustomAlertForm
         context["custom_alert_filters"] = json.dumps(params)
+        context["title"] = title
+        context["date"] = date
+        context["keywords"] = ", ".join(map(str, keywords))
 
         return context
 

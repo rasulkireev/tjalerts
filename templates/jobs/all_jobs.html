@@ -5,8 +5,29 @@
 {% load url_utils %}
 {% load date_utils %}
 
-{% block content %}
+{% block meta %}
+<title>{{ title }}</title>
+<meta name="description" content="Jobs that match these keywords: {{ keywords }}. From {{ date }}." />
+<meta name="keywords" content="{{ keywords }}" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="{{ canonical_url }}" />
 
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{ title }}" />
+<meta property="og:url" content="{{ canonical_url }}" />
+<meta property="og:description" content="Jobs that match these keywords: {{ keywords }}. From {{ date }}." />
+<meta property="og:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="@rasulkireev" />
+<meta name="twitter:site" content="@rasulkireev" />
+<meta name="twitter:title" content="{{ title }}" />
+<meta name="twitter:description" content="Jobs that match these keywords: {{ keywords }}. From {{ date }}." />
+<meta name="twitter:image" content="https://{{ request.get_host }}{% static 'vendors/images/logo.png' %}" />
+{% endblock meta %}
+
+{% block content %}
 <div class="grid overflow-hidden grid-cols-12 gap-2 mx-auto mt-10 mb-16 max-w-7xl bg-white sm:mb-24">
   <div data-controller="dialog" data-action="click->dialog#backdropClose" class="col-span-12 px-2 rounded-md border border-gray-200 md:col-span-3 sm:px-4 sm:pt-4">
 
@@ -221,8 +242,8 @@
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "Tech Job Alerts - Jobs",
-  "description": "List of filtered job postings.",
+  "name": "{{ title }}",
+  "description": "Jobs that match these keywords: {{ keywords }}. From {{ date }}.",
   "itemListElement": [{% for job in page_obj %}
     {
       "@type": "ListItem",
@@ -231,7 +252,7 @@
       "item": {
         "@type": "JobPosting",
         "name":"{% if job.jobs %}{{ job.titles.all.0.name }}{% else %}Developer{% endif %}",
-        "title":"{% if job.jobs %}{{ job.titles.all.0.name }}{% else %}Developer{% endif %}",
+        "{{ title }}":"{% if job.jobs %}{{ job.titles.all.0.name }}{% else %}Developer{% endif %}",
         "jobLocation": {
           "@type": "Place",
           "address": {% if job.locations %}"{{ job.locations }}"{% else %}"Remote"{% endif %}

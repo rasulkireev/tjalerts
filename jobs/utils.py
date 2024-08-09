@@ -9,7 +9,7 @@ from hn_jobs.utils import get_tjalerts_logger
 client = OpenAI()
 
 from .constants import GENERIC_KEYWORDS
-from .models import Technology
+from .models import Technology, Title
 
 logger = get_tjalerts_logger(__name__)
 
@@ -189,3 +189,76 @@ def is_email_confirmed(user):
         return email_address.verified
     except EmailAddress.DoesNotExist:
         return False
+
+
+def generate_job_search_title(query_params, first_item_datetime):
+    date = first_item_datetime.strftime("%B %Y")
+    if len(query_params) > 1 or len(query_params) == 0:
+        return f"Available Jobs - {date}"
+
+    query_param = list(query_params.keys())[0]
+
+    if query_param == "technologies":
+        technologies_list = query_params.getlist("technologies")
+        if len(technologies_list) == 1:
+            tech_name = Technology.objects.get(id=query_params.getlist("technologies")[0]).name
+            return f"{tech_name} Jobs - {date}"
+
+    if query_param == "titles":
+        titles_list = query_params.getlist("titles")
+        if len(titles_list) == 1:
+            title_name = Title.objects.get(id=query_params.getlist("titles")[0]).name
+            return f"{title_name} Jobs - {date}"
+
+    if query_param == "locations":
+        return f"Jobs in {query_params['locations']} - {date}"
+
+    if query_param == "compensation_summary__isempty":
+        compensation_summary = query_params["compensation_summary__isempty"]
+        return f"Jobs with {'no' if compensation_summary == 'false' else ''} Comp Info - {date}"
+
+    if query_param == "emails__isempty":
+        emails = query_params["emails__isempty"]
+        return f"Jobs with {'no' if emails == 'false' else ''} Contact Info - {date}"
+
+    if query_param == "is_remote":
+        is_remote = query_params["is_remote"]
+        return f"{'Remote' if is_remote == 'true' else ''} Jobs - {date}"
+
+    if query_param == "is_onsite":
+        is_onsite = query_params["is_onsite"]
+        return f"{'Onsite' if is_onsite == 'true' else ''} Jobs - {date}"
+
+    return f"Available Jobs - {date}"
+
+
+def generate_job_search_keywords(query_params):
+    keywords = []
+
+    for key in query_params.keys():
+        if key == "technologies":
+            technologies_list = query_params.getlist("technologies")
+            for tech_id in technologies_list:
+                keywords.append(Technology.objects.get(id=tech_id).name)
+
+        if key == "titles":
+            titles_list = query_params.getlist("titles")
+            for title_id in titles_list:
+                keywords.append(Title.objects.get(id=title_id).name)
+
+        if key == "locations":
+            keywords.append(query_params["locations"])
+
+        if key == "compensation_summary__isempty" and query_params["compensation_summary__isempty"] == "true":
+            keywords.append("Compensation Information")
+
+        if key == "emails__isempty" and query_params["emails__isempty"] == "true":
+            keywords.append("Contact Information")
+
+        if key == "is_remote" and query_params["is_remote"] == "true":
+            keywords.append("Remote")
+
+        if key == "is_onsite" and query_params["is_onsite"] == "true":
+            keywords.append("Onsite")
+
+    return keywords
