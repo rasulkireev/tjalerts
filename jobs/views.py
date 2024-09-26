@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Count, Exists, Max, OuterRef, Subquery
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
@@ -270,46 +270,59 @@ class AlertCreateView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy("home")
 
     def form_valid(self, form):
-        user = self.request.user
-        existing_alerts = Alert.objects.filter(email=form.instance.email)
-
-        if user.is_authenticated:
-            form.instance.user = user
-
-        technology_id = str(Technology.objects.get(name=form.cleaned_data["technology_selected"]).id)
-
-        form.instance.filter = {"technologies": [technology_id]}
-
         try:
-            validate_technology_selected(form.cleaned_data["technology_selected"])
-        except ValidationError:
-            messages.add_message(self.request, messages.WARNING, "Please use a Technology from the dropdown list.")
-            return redirect("home")
+            user = self.request.user
+            existing_alerts = Alert.objects.filter(email=form.instance.email)
 
-        # if user.is_authenticated and existing_alerts.count() >= 3:
-        #     messages.add_message(self.request, messages.WARNING, "Free users can only have 3 alerts.")
-        #     return redirect("home")
+            if user.is_authenticated:
+                form.instance.user = user
 
-        if not user.is_authenticated and existing_alerts.exists():
-            messages.add_message(self.request, messages.WARNING, "Sign up to create multiple alerts.")
-            return redirect("home")
+            technology = Technology.objects.filter(name=form.cleaned_data["technology_selected"]).first()
+            if not technology:
+                messages.add_message(self.request, messages.WARNING, "Invalid technology selected.")
+                return redirect("home")
 
-        if user.is_authenticated and existing_alerts.exists():
-            if existing_alerts.latest("modified").confirmed is True:
-                form.instance.confirmed = True
-                messages.add_message(
-                    self.request, messages.SUCCESS, "Alert has been added, you will start getting jobs soon!"
+            form.instance.filter = {"technologies": [str(technology.id)]}
+
+            try:
+                validate_technology_selected(form.cleaned_data["technology_selected"])
+            except ValidationError:
+                messages.add_message(self.request, messages.WARNING, "Please use a Technology from the dropdown list.")
+                return redirect("home")
+
+            if not user.is_authenticated and existing_alerts.exists():
+                messages.add_message(self.request, messages.WARNING, "Sign up to create multiple alerts.")
+                return redirect("home")
+
+            if user.is_authenticated and existing_alerts.exists():
+                if existing_alerts.latest("modified").confirmed is True:
+                    form.instance.confirmed = True
+                    messages.add_message(
+                        self.request, messages.SUCCESS, "Alert has been added, you will start getting jobs soon!"
+                    )
+            else:
+                confirmation_url = self.request.build_absolute_uri(
+                    reverse("confirm_subscription", args=[form.instance.id])
                 )
-        else:
-            confirmation_url = self.request.build_absolute_uri(reverse("confirm_subscription", args=[form.instance.id]))
-            async_task(send_confirmation_email, form.cleaned_data, confirmation_url, group="Send Confirmation Email")
-            messages.add_message(
-                self.request, messages.SUCCESS, "Thank for creating an alert! Check your emails to confirm!"
-            )
+                async_task(
+                    send_confirmation_email, form.cleaned_data, confirmation_url, group="Send Confirmation Email"
+                )
+                messages.add_message(
+                    self.request, messages.SUCCESS, "Thank for creating an alert! Check your emails to confirm!"
+                )
 
-        async_task(find_users_to_alert, group="Find Users to Alert")
+            async_task(find_users_to_alert, group="Find Users to Alert")
 
-        return super(AlertCreateView, self).form_valid(form)
+            return super(AlertCreateView, self).form_valid(form)
+
+        except IntegrityError as e:
+            logger.error("IntegrityError in AlertCreateView", error={str(e)})
+            messages.add_message(self.request, messages.ERROR, f"An error occurred: {str(e)}")
+            return redirect("home")
+        except Exception as e:
+            messages.add_message(self.request, messages.ERROR, "An unexpected error occurred. Please try again.")
+            logger.error("Exception in AlertCreateView", error={str(e)})
+            return redirect("home")
 
 
 class ConfirmAlertView(SuccessMessageMixin, UpdateView):
