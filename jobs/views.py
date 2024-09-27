@@ -437,7 +437,12 @@ class CompanyJobsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["company"] = Company.objects.get(slug=self.kwargs.get("slug"))
+        companies = Company.objects.filter(slug=self.kwargs.get("slug"))
+        if companies.exists():
+            context["company"] = companies.first()
+        else:
+            # Handle the case where no company is found
+            context["company"] = None
         return context
 
 
