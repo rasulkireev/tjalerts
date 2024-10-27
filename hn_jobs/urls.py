@@ -31,6 +31,7 @@ urlpatterns = (
         path("jobs/", include("jobs.urls")),
         path("api/", include("api.urls")),
         path("sitemap.xml", sitemap, sitemaps),
+        path("uses", TemplateView.as_view(template_name="pages/uses.html"), name="uses"),
         path(
             "robots.txt",
             TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
