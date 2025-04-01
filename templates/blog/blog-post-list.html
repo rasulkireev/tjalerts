@@ -12,65 +12,29 @@
   <div class="py-24 bg-white">
     <div class="px-6 mx-auto max-w-7xl lg:px-8">
       <div class="mx-auto max-w-2xl">
-        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Blog</h2>
-        <!-- <p class="mt-2 text-lg leading-8 text-gray-600">Learn how to grow your business with our expert advice.</p> -->
+        <h2 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">Blog</h2>
 
-        <!-- <div class="pt-10 mt-10 space-y-16 border-t border-gray-200 sm:mt-16 sm:pt-16">
-          <h3 class="text-2xl font-bold tracking-tight text-center text-gray-900 sm:text-3xl">General</h3>
-          <article class="flex flex-col justify-between items-start max-w-xl">
-            <div class="flex gap-x-4 items-center text-xs">
-              <time datetime="2020-03-16" class="text-gray-500">Mar 16, 2020</time>
-              <a href="#" class="relative z-10 px-3 py-1.5 font-medium text-gray-600 bg-gray-50 rounded-full hover:bg-gray-100">Marketing</a>
+        <div class="pt-10 mt-10 space-y-8 border-t border-gray-200 sm:mt-16 sm:pt-16">
+          {% for post in object_list %}
+            <article class="p-6 bg-gray-50 rounded-xl transition-all duration-200 hover:bg-gray-100">
+              <a href="{{ post.get_absolute_url }}" class="block">
+                <div class="flex gap-x-4 items-center text-sm">
+                  <time datetime="{{ post.created|date:'Y-m-d' }}" class="font-medium text-gray-500">{{ post.created|date:"F j, Y" }}</time>
+                </div>
+                <div class="group">
+                  <h3 class="mt-3 text-xl font-semibold leading-7 text-gray-900 group-hover:text-blue-600">
+                    {{ post.title }}
+                  </h3>
+                  <p class="mt-4 text-base leading-6 text-gray-600">{{ post.description }}</p>
+                </div>
+              </a>
+            </article>
+          {% empty %}
+            <div class="p-8 text-center bg-gray-50 rounded-xl">
+              <p class="text-lg text-gray-500">No blog posts available yet.</p>
             </div>
-            <div class="relative group">
-              <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                <a href="#">
-                  <span class="absolute inset-0"></span>
-                  Boost your conversion rate
-                </a>
-              </h3>
-              <p class="mt-5 text-sm leading-6 text-gray-600 line-clamp-3">Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.</p>
-            </div>
-          </article>
-
-          <article class="flex flex-col justify-between items-start max-w-xl">
-            <div class="flex gap-x-4 items-center text-xs">
-              <time datetime="2020-03-16" class="text-gray-500">Mar 16, 2020</time>
-              <a href="#" class="relative z-10 px-3 py-1.5 font-medium text-gray-600 bg-gray-50 rounded-full hover:bg-gray-100">Marketing</a>
-            </div>
-            <div class="relative group">
-              <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                <a href="#">
-                  <span class="absolute inset-0"></span>
-                  Boost your conversion rate
-                </a>
-              </h3>
-              <p class="mt-5 text-sm leading-6 text-gray-600 line-clamp-3">Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.</p>
-            </div>
-          </article>
-        </div> -->
-
-        <div class="pt-10 mt-10 border-t border-gray-200 sm:mt-16 sm:pt-16">
-          <h3 class="mb-4 text-2xl font-bold tracking-tight text-center text-gray-900 sm:text-3xl">Highest Paid Technologies in {{ current_month_str }} {{ current_year }}</h3>
-          {% for tech_slug in hirable_tech_list %}
-          <article class="flex flex-col justify-between items-start max-w-xl">
-            <div class="flex hidden gap-x-4 items-center text-xs">
-              <time datetime="{{ current_year }}-{{ current_month }}-01" class="text-gray-500">{{ current_month_str }} 1, {{ current_year }}</time>
-            </div>
-            <div class="relative group">
-              <h3 class="mt-3 text-lg font-semibold leading-6 text-gray-90 group-hover:text-gray-600">
-                <a href="{% url 'highest-paid-job-blog-post' slug=tech_slug %}">
-                  <span class="absolute inset-0"></span>
-                  Top 10 Highest Paying Companies that use {{ tech_slug|get_technology_name_from_slug }}
-                </a>
-              </h3>
-            </div>
-          </article>
           {% endfor %}
-
-          <!-- More posts... -->
         </div>
-
       </div>
     </div>
   </div>

@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 
 import environ
+import logfire
 import posthog
 import sentry_sdk
 import structlog
@@ -30,6 +31,8 @@ env = environ.Env(
 ENVIRONMENT = env("ENVIRONMENT")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
+
+logfire.configure(environment=ENVIRONMENT)
 
 SECRET_KEY = env("SECRET_KEY")
 
@@ -331,6 +334,7 @@ structlog.configure(
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
+        logfire.StructlogProcessor(),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),

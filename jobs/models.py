@@ -6,19 +6,25 @@ from django.urls import reverse
 from model_utils.models import TimeStampedModel
 from pgvector.django import HnswIndex, VectorField
 
+from jobs.choices import PostSource
 from utils.models import BaseModel
 
 
 class Post(TimeStampedModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    submitted_datetime = models.DateTimeField()
 
+    # HN Specific
     who_is_hiring_id = models.IntegerField()
     who_is_hiring_title = models.CharField(max_length=25)
     who_is_hiring_comment_id = models.IntegerField(unique=True)
     hn_username = models.CharField(max_length=50, blank=True)
-    submitted_datetime = models.DateTimeField()
 
-    source = models.CharField(max_length=200, default="Hacker News")
+    source = models.CharField(
+        max_length=200,
+        choices=PostSource.choices,
+        default=PostSource.HACKER_NEWS,
+    )
 
     original_text = models.TextField(blank=True)
     titles = models.ManyToManyField("Title", related_name="post", blank=True, through="PostTitle")
