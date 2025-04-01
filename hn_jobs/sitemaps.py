@@ -128,7 +128,7 @@ class TitlesJobsListicleSitemap(sitemaps.Sitemap):
 
 class BlogPostSitemap(sitemaps.Sitemap):
     changefreq = "weekly"
-    priority = 0.8
+    priority = 0.91
     protocol = "https"
 
     def items(self):
@@ -138,7 +138,7 @@ class BlogPostSitemap(sitemaps.Sitemap):
         return obj.modified
 
     def location(self, obj):
-        return reverse("blog-post-detail", kwargs={"slug": obj.slug})
+        return reverse("blog-post", kwargs={"slug": obj.slug})
 
 
 sitemaps = {
