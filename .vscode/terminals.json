@@ -8,7 +8,7 @@
     },
     {
       "name": "Frontend",
-      "command": "npm run start",
+      "command": "pnpm run start",
     },
     {
       "name": "Workers",

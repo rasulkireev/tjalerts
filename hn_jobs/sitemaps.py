@@ -1,5 +1,6 @@
 from django.contrib import sitemaps
-from django.contrib.sitemaps import GenericSitemap
+
+# from django.contrib.sitemaps import GenericSitemap
 from django.db.models import Count, Exists, Max, OuterRef
 from django.urls import reverse
 from django.utils import timezone
@@ -127,17 +128,17 @@ class TitlesJobsListicleSitemap(sitemaps.Sitemap):
 sitemaps = {
     "sitemaps": {
         "static": StaticViewSitemap,
-        "highest_paid_jobs_listicle": HighestPaidJobsListicleSitemap,
-        "company_jobs": CompaniesJobsListicleSitemap,
-        "technology_jobs": TechnologiesJobsListicleSitemap,
-        "title_jobs": TitlesJobsListicleSitemap,
-        "posts": GenericSitemap(
-            {
-                "queryset": Post.objects.filter(created__gte=timezone.now() - timezone.timedelta(days=60)),
-                "date_field": "modified",
-            },
-            priority=0.7,
-            protocol="https",
-        ),
+        # "highest_paid_jobs_listicle": HighestPaidJobsListicleSitemap,
+        # "company_jobs": CompaniesJobsListicleSitemap,
+        # "technology_jobs": TechnologiesJobsListicleSitemap,
+        # "title_jobs": TitlesJobsListicleSitemap,
+        # "posts": GenericSitemap(
+        #     {
+        #         "queryset": Post.objects.filter(created__gte=timezone.now() - timezone.timedelta(days=60)),
+        #         "date_field": "modified",
+        #     },
+        #     priority=0.7,
+        #     protocol="https",
+        # ),
     }
 }

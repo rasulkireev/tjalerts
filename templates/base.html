@@ -58,10 +58,33 @@
             <img class="w-auto h-8" src="{% static 'vendors/images/logo.png' %}" alt="Tech Job Alerts Logo" />
             <!-- <span class="text-base font-semibold text-gray-700">Tech Job Alerts</span> -->
           </a>
-          <a href="{% url 'posts' %}" class="hidden text-base font-semibold md:inline text-gray-7000 hover:underline">Jobs</a>
-          <a href="{% url 'companies' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Companies</a>
-          <a href="{% url 'technologies' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Technologies</a>
-          <a href="{% url 'titles' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Titles</a>
+
+          <!-- Product Dropdown -->
+          <div data-controller="dropdown" class="relative">
+            <button type="button" data-action="dropdown#toggle click@window->dropdown#hide"
+              class="hidden gap-x-1 items-center text-base font-semibold text-gray-700 md:flex hover:text-gray-900"
+              id="product-menu-button" aria-expanded="false" aria-haspopup="true">
+              Product
+              <svg class="ml-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+            </button>
+            <div data-dropdown-target="menu"
+              class="hidden absolute left-0 z-10 py-1 mt-2 w-48 bg-white rounded-md ring-1 ring-black ring-opacity-5 shadow-lg origin-top-left focus:outline-none"
+              role="menu" aria-orientation="vertical" aria-labelledby="product-menu-button" tabindex="-1">
+              <a href="{% url 'posts' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-300"
+              role="menuitem" data-action="dropdown#toggle" tabindex="-1">Jobs</a>
+              <a href="{% url 'companies' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-300"
+                role="menuitem" data-action="dropdown#toggle" tabindex="-1">Companies</a>
+              <a href="{% url 'technologies' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-300"
+                role="menuitem" data-action="dropdown#toggle" tabindex="-1">Technologies</a>
+              <a href="{% url 'titles' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-300"
+                role="menuitem" data-action="dropdown#toggle" tabindex="-1">Job titles</a>
+            </div>
+          </div>
+
+          <!-- Blog Link -->
+          <a href="{% url 'blog-posts' %}" class="hidden text-base font-semibold text-gray-700 md:inline hover:underline">Blog</a>
         </div>
         <div class="flex lg:hidden">
           <button data-action="dropdown#toggle click@window->dropdown#hide" type="button"
