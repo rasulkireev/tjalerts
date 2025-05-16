@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List
+from typing import Optional
 
 from ninja import Schema
 from pydantic import UUID4
@@ -63,3 +64,12 @@ class PostSchema(Schema):
 
 class SimilarPostsResponse(Schema):
     similar_posts: List[PostSchema]
+
+
+class BlogPostCreateSchema(Schema):
+    title: str
+    slug: str
+    content: str
+    description: Optional[str] = None
+    tags: Optional[str] = None
+    status: Optional[str] = "DR"  # Corresponds to BlogPost.DRAFT

@@ -10,7 +10,7 @@ class BlogPost(TimeStampedModel):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="post")
     slug = models.SlugField(max_length=250)
     content = models.TextField()
-
+    tags = models.TextField(blank=True)
     icon = models.ImageField(upload_to="images/", blank=True)
 
     DRAFT = "DR"
