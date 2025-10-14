@@ -2,9 +2,10 @@
 
 from .base import *
 
+LOGGING["loggers"]["django.server"]["level"] = "WARNING"
+LOGGING["loggers"]["django_structlog"]["handlers"].append("json_console")
 LOGGING["loggers"]["tjalerts"]["level"] = env("DJANGO_LOG_LEVEL", default="INFO")
-LOGGING["loggers"]["tjalerts"]["handlers"] = ["json_console"]
-LOGGING["loggers"]["django_structlog"]["handlers"] = ["json_console"]
+LOGGING["loggers"]["tjalerts"]["handlers"].append("json_console")
 
 CACHES = {
     "default": {
