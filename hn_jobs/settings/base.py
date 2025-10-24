@@ -99,6 +99,7 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "posthog.sentry.django.PosthogDistinctIdMiddleware",
     "django_structlog.middlewares.RequestMiddleware",
@@ -211,9 +212,8 @@ LOGIN_REDIRECT_URL = "home"
 ACCOUNT_LOGOUT_REDIRECT_URL = "home"
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_LOGIN_METHODS = {"username"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_FORMS = {
@@ -224,15 +224,31 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = False
 if not DEBUG:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-SOCIALACCOUNT_PROVIDERS = {
-    "github": {
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_ADAPTER = "hn_jobs.adapters.CustomSocialAccountAdapter"
+SOCIALACCOUNT_PROVIDERS = {}
+
+GITHUB_CLIENT_ID = env("GITHUB_CLIENT_ID", default="")
+if GITHUB_CLIENT_ID != "":
+    SOCIALACCOUNT_PROVIDERS["github"] = {
+        "VERIFIED_EMAIL": True,
+        "EMAIL_AUTHENTICATION": True,
+        "AUTO_SIGNUP": True,
+        "APP": {
+            "client_id": env("GITHUB_CLIENT_ID"),
+            "secret": env("GITHUB_CLIENT_SECRET"),
+        },
         "SCOPE": [
             "user",
             "repo",
             "read:org",
         ],
-    },
-    "google": {
+    }
+
+GOOGLE_CLIENT_ID = env("GOOGLE_CLIENT_ID", default="")
+GOOGLE_CLIENT_SECRET = env("GOOGLE_CLIENT_SECRET", default="")
+if GOOGLE_CLIENT_ID != "":
+    SOCIALACCOUNT_PROVIDERS["google"] = {
         "SCOPE": [
             "profile",
             "email",
@@ -241,13 +257,18 @@ SOCIALACCOUNT_PROVIDERS = {
             "access_type": "online",
         },
         "OAUTH_PKCE_ENABLED": True,
-    },
-}
+        "APP": {
+            "client_id": env("GOOGLE_CLIENT_ID"),
+            "secret": env("GOOGLE_CLIENT_SECRET"),
+        },
+        "AUTO_SIGNUP": True,
+        "EMAIL_AUTHENTICATION": True,
+    }
 
 Q_CLUSTER = {
     "name": "hn_jobs-q",
-    "timeout": 90,
-    "retry": 120,
+    "timeout": 3600,  # 1 hour
+    "retry": 4800,  # 80 minutes
     "workers": 4,
     "max_attempts": 2,
     "redis": env("REDIS_URL"),
@@ -283,7 +304,6 @@ MJML_HTTPSERVERS = [
 if SENTRY_DSN:
     Q_CLUSTER["error_reporter"]["sentry"] = {"dsn": SENTRY_DSN}
     sentry_sdk.init(
-        debug=DEBUG,
         dsn=SENTRY_DSN,
         environment=ENVIRONMENT,
         send_default_pii=False,
@@ -390,7 +410,7 @@ LOGGING = {
         # for some reason...
         "django.server": {
             "handlers": ["console"],
-            "level": "ERROR",
+            "level": "CRITICAL",
             "propagate": False,
         },
         "django.request": {

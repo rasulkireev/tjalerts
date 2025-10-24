@@ -74,3 +74,37 @@ class BlogPostCreateSchema(Schema):
     description: Optional[str] = None
     tags: Optional[str] = None
     status: Optional[str] = "DR"  # Corresponds to BlogPost.DRAFT
+
+
+class JobEmailSchema(Schema):
+    email: str
+    name: str
+    email_is_valid: bool
+    email_is_generic: bool
+    is_approved: bool
+
+
+class JobSchema(Schema):
+    id: str
+    company_name: str
+    company_url: str
+    description: str
+    compensation_summary: Optional[str]
+    min_salary: Optional[int]
+    max_salary: Optional[int]
+    is_remote: bool
+    locations: str
+    technologies: List[str]
+    title: List[str]
+    who_is_hiring_comment_id: int
+    submitted_datetime: datetime
+    emails: List[JobEmailSchema]
+
+
+class JobsResponse(Schema):
+    count: int
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+    jobs: List[JobSchema]
