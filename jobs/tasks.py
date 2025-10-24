@@ -112,8 +112,7 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
 
     try:
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0,
+            model="gpt-5-mini",
             response_format={"type": "json_object"},
             messages=[
                 {
@@ -334,8 +333,7 @@ Return a valid JSON Object with the following format:
 Do not return anything else. Just the JSON Object."""  # noqa: E501
 
     completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        temperature=0,
+        model="gpt-5-mini",
         response_format={"type": "json_object"},
         messages=[
             {
@@ -514,3 +512,55 @@ def add_email_to_buttondown(email, tag):
     )
 
     return r.json()
+
+
+def send_daily_new_contacts_email():
+    from django.db.models import Case, When, Value, IntegerField
+
+    yesterday = timezone.now() - timedelta(days=1)
+
+    new_emails = (
+        Email.objects.filter(created__gte=yesterday, email_is_valid=True)
+        .select_related("company", "post")
+        .annotate(
+            priority=Case(
+                When(name__isnull=False, name__gt="", email_is_generic=False, then=Value(1)),
+                When(name__isnull=False, name__gt="", email_is_generic=True, then=Value(2)),
+                When(name__isnull=True, email_is_generic=False, then=Value(3)),
+                When(name="", email_is_generic=False, then=Value(3)),
+                default=Value(4),
+                output_field=IntegerField(),
+            )
+        )
+        .order_by("priority", "-created")
+    )
+
+    if not new_emails.exists():
+        logger.info("No new contacts to send")
+        return "No new contacts found"
+
+    superuser = CustomUser.objects.filter(is_superuser=True).first()
+    if not superuser or not superuser.email:
+        logger.warning("No superuser with email found")
+        return "No superuser email found"
+
+    subject = f"New Contacts Added - {timezone.now().strftime('%B %d, %Y')}"
+
+    email_body = "Here are the new contacts that were added in the last 24 hours:\n\n"
+
+    for email_obj in new_emails:
+        name = email_obj.name if email_obj.name else "N/A"
+        email_body += f"{name} | {email_obj.email} | {email_obj.company.name} | {email_obj.company.fixed_company_homepage_link} | https://gettjalerts.com{email_obj.post.get_absolute_url()}\n"
+
+    email_body += f"\nTotal new contacts: {new_emails.count()}\n"
+
+    send_mail(
+        subject,
+        email_body,
+        settings.DEFAULT_FROM_EMAIL,
+        [superuser.email],
+        fail_silently=False,
+    )
+
+    logger.info("Daily new contacts email sent", count=new_emails.count(), recipient=superuser.email)
+    return f"Sent email with {new_emails.count()} new contacts to {superuser.email}"

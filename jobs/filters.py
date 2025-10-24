@@ -37,12 +37,12 @@ class PostFilter(FilterSet):
     vector = VectorEmbeddingFilter(field_name="vector")
     locations = CharFilter(lookup_expr="icontains")
     technologies = ModelMultipleChoiceFilter(
-        queryset=get_most_popular_technologies(),
+        queryset=lambda request: get_most_popular_technologies(),
         widget=forms.CheckboxSelectMultiple(),
         method="extend_technology_search",
     )
     titles = ModelMultipleChoiceFilter(
-        queryset=get_most_popular_titles(),
+        queryset=lambda request: get_most_popular_titles(),
         widget=forms.CheckboxSelectMultiple(),
     )
     compensation_summary__isempty = EmptyStringFilter(field_name="compensation_summary")

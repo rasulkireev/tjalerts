@@ -1,4 +1,5 @@
-from allauth.account.utils import send_email_confirmation
+from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import redirect
@@ -36,6 +37,10 @@ class UserSettingsView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
 def resend_email_confirmation_email(request):
     user = request.user
-    send_email_confirmation(request, user, user.email)
+
+    adapter = get_adapter(request)
+    emailaddress = EmailAddress.objects.get_for_user(user, user.email)
+
+    adapter.send_confirmation_mail(request, emailaddress, signup=False)
 
     return redirect("settings")

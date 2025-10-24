@@ -6,16 +6,24 @@ from django.conf import settings
 
 
 def migrate_data(apps, schema_editor):
-    Subscriber = apps.get_model('users', 'Subscriber')
+    try:
+        Subscriber = apps.get_model('users', 'Subscriber')
+    except LookupError:
+        # Subscriber model doesn't exist yet, skip migration
+        return
+
     Alert = apps.get_model('jobs', 'Alert')
     Technology = apps.get_model('jobs', 'Technology')
 
     for subscriber in Subscriber.objects.filter(confirmed=True):
-        technology_id = str(Technology.objects
-                            .annotate(post_count=Count("posttechnology"))
-                            .filter(name__contains=subscriber.technology_selected)
-                            .order_by("-post_count")
-                            .first().id)
+        technology = Technology.objects.annotate(
+            post_count=Count("posttechnology")
+        ).filter(name__contains=subscriber.technology_selected).order_by("-post_count").first()
+
+        if not technology:
+            continue
+
+        technology_id = str(technology.id)
 
         filter_dict = {
             "technologies": [technology_id]

@@ -15,7 +15,15 @@ from jobs.queries import get_similar_posts_from_db
 from jobs.tasks import create_valid_emails
 from users.models import CustomUser
 
-from .schemas import BlogPostCreateSchema, ReadCompany, ReadEmails, SimilarPostsResponse, TechnologySchema, TitleSchema
+from .schemas import (
+    BlogPostCreateSchema,
+    JobsResponse,
+    ReadCompany,
+    ReadEmails,
+    SimilarPostsResponse,
+    TechnologySchema,
+    TitleSchema,
+)
 
 logger = get_tjalerts_logger(__name__)
 
@@ -66,21 +74,36 @@ def get_emails(
     }
 
 
-@api.get("/jobs")
-def get_jobs(request, technologies=Query(None)):
-    posts = Post.objects.prefetch_related("company", "technologies", "titles")
+@api.get("/jobs", response=JobsResponse)
+def get_jobs(
+    request,
+    technologies=Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+):
+    posts = Post.objects.prefetch_related("company", "technologies", "titles", "email")
 
-    user_submitted_technologies = technologies.split(",")
-    user_submitted_technologies = [item.strip() for item in user_submitted_technologies]
+    if technologies:
+        user_submitted_technologies = technologies.split(",")
+        user_submitted_technologies = [item.strip() for item in user_submitted_technologies]
+    else:
+        user_submitted_technologies = []
 
     posts_list = []
     for post in posts:
         post_technologies = [technology.name for technology in post.technologies.all()]
 
-        if not set(user_submitted_technologies).issubset(post_technologies):
+        if user_submitted_technologies and not set(user_submitted_technologies).issubset(post_technologies):
             continue
 
         post_titles = [title.name for title in post.titles.all()]
+        post_emails = [
+            {
+                "email": email.email,
+                "name": email.name,
+            }
+            for email in post.email.all()
+        ]
 
         entry = {
             "company_name": post.company.name,
@@ -96,13 +119,25 @@ def get_jobs(request, technologies=Query(None)):
             "id": str(post.id),
             "who_is_hiring_comment_id": post.who_is_hiring_comment_id,
             "submitted_datetime": post.submitted_datetime,
+            "emails": post_emails,
         }
 
         posts_list.append(entry)
 
+    total = len(posts_list)
+    total_pages = (total + page_size - 1) // page_size
+
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    paginated_jobs = posts_list[start_index:end_index]
+
     return {
-        "count": len(posts_list),
-        "jobs": posts_list,
+        "count": len(paginated_jobs),
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages,
+        "jobs": paginated_jobs,
     }
 
 
