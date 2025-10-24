@@ -517,10 +517,18 @@ def add_email_to_buttondown(email, tag):
 def send_daily_new_contacts_email():
     from django.db.models import Case, When, Value, IntegerField
 
-    yesterday = timezone.now() - timedelta(days=1)
+    now = timezone.now()
+    yesterday_start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday_end = (now - timedelta(days=1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+    current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
 
     new_emails = (
-        Email.objects.filter(created__gte=yesterday, email_is_valid=True)
+        Email.objects.filter(
+            created__gte=yesterday_start,
+            created__lte=yesterday_end,
+            email_is_valid=True,
+            post__submitted_datetime__gte=current_month_start,
+        )
         .select_related("company", "post")
         .annotate(
             priority=Case(
@@ -535,24 +543,24 @@ def send_daily_new_contacts_email():
         .order_by("priority", "-created")
     )
 
-    if not new_emails.exists():
-        logger.info("No new contacts to send")
-        return "No new contacts found"
-
     superuser = CustomUser.objects.filter(is_superuser=True).first()
     if not superuser or not superuser.email:
         logger.warning("No superuser with email found")
         return "No superuser email found"
 
-    subject = f"New Contacts Added - {timezone.now().strftime('%B %d, %Y')}"
+    subject = f"New Contacts Report - {yesterday_start.strftime('%B %d, %Y')}"
 
-    email_body = "Here are the new contacts that were added in the last 24 hours:\n\n"
+    if not new_emails.exists():
+        email_body = f"No new contacts were added on {yesterday_start.strftime('%B %d, %Y')}.\n"
+        logger.info("No new contacts to send")
+    else:
+        email_body = f"Here are the new contacts that were added on {yesterday_start.strftime('%B %d, %Y')}:\n\n"
 
-    for email_obj in new_emails:
-        name = email_obj.name if email_obj.name else "N/A"
-        email_body += f"{name} | {email_obj.email} | {email_obj.company.name} | {email_obj.company.fixed_company_homepage_link} | https://gettjalerts.com{email_obj.post.get_absolute_url()}\n"
+        for email_obj in new_emails:
+            name = email_obj.name if email_obj.name else "N/A"
+            email_body += f"{name} | {email_obj.email} | {email_obj.company.name} | {email_obj.company.fixed_company_homepage_link} | https://gettjalerts.com{email_obj.post.get_absolute_url()}\n"
 
-    email_body += f"\nTotal new contacts: {new_emails.count()}\n"
+        email_body += f"\nTotal new contacts: {new_emails.count()}\n"
 
     send_mail(
         subject,
