@@ -31,7 +31,6 @@ shift $((OPTIND - 1))
 if [ "$server" = true ]; then
     python manage.py collectstatic --noinput
     python manage.py migrate
-    python manage.py createschedules
     # python manage.py djstripe_sync_models
     gunicorn ${PROJECT_NAME}.wsgi:application --bind 0.0.0.0:80 --workers 3 --threads 2 --reload
 else
