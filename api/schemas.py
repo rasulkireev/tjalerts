@@ -79,9 +79,6 @@ class BlogPostCreateSchema(Schema):
 class JobEmailSchema(Schema):
     email: str
     name: str
-    email_is_valid: bool
-    email_is_generic: bool
-    is_approved: bool
 
 
 class JobSchema(Schema):
