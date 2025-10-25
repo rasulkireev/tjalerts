@@ -95,6 +95,9 @@ def get_jobs(
             for tech in tech_objects:
                 posts = posts.filter(technologies=tech)
 
+    # Sort by most recent submissions first
+    posts = posts.order_by("-submitted_datetime")
+
     # Apply pagination at database level BEFORE materializing the queryset
     total = posts.count()
     total_pages = (total + page_size - 1) // page_size
@@ -136,7 +139,7 @@ def get_jobs(
         posts_list.append(entry)
 
     return {
-        "count": len(posts_list),
+        "count": total,
         "total": total,
         "page": page,
         "page_size": page_size,
