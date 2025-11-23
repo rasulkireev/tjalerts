@@ -102,7 +102,7 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "posthog.sentry.django.PosthogDistinctIdMiddleware",
-    "django_structlog.middlewares.RequestMiddleware",
+    # "django_structlog.middlewares.RequestMiddleware",
 ]
 
 ROOT_URLCONF = "hn_jobs.urls"
