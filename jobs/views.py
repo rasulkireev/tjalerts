@@ -422,7 +422,6 @@ class CompanyJobsView(ListView):
         else:
             # Handle the case where no company is found
             context["company"] = None
-        context["canonical_url"] = build_absolute_site_url(self.request.path)
         return context
 
 

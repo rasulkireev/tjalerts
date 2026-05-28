@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import sitemaps
 
 # from django.contrib.sitemaps import GenericSitemap
@@ -58,7 +60,7 @@ class CompaniesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("company")
 
         companies_with_recent_posts = (
@@ -82,7 +84,7 @@ class TechnologiesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("technologies")
 
         technologies_with_recent_posts = (
@@ -109,7 +111,7 @@ class TitlesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("titles")
 
         titles_with_recent_posts = (
@@ -150,7 +152,7 @@ class RecentPostSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         return Post.objects.filter(created__gte=two_months_ago).exclude(description="")
 
     def lastmod(self, obj):
