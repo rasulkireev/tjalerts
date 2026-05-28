@@ -31,7 +31,6 @@ def build_absolute_site_url(path="/"):
 def site_metadata(request):
     return {
         "SITE_URL": settings.SITE_URL,
-        "SITE_NAME": "Tech Job Alerts",
     }
 
 
