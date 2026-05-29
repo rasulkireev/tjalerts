@@ -30,20 +30,12 @@ export default class extends Controller {
     };
 
     return `
-      <li>
-        <a class="flex flex-col px-6 py-2 bg-white rounded-md hover:bg-gray-50" href="/jobs/${post.id}">
-          <div class="flex justify-between items-center py-2 w-full">
-            <div class="flex-1">
-              <div class="flex justify-between items-center">
-                <p class="text-sm font-medium text-gray-900 truncate">
-                ${post.company.name}
-                </p>
-              </div>
-              <p class="text-xs text-gray-600">
-                ${truncateDescription(post.description, 150)}
-              </p>
-            </div>
-          </div>
+      <li class="job-card">
+        <a class="block p-4" href="/jobs/${post.id}">
+          <p class="truncate text-sm font-semibold text-zinc-950">${post.company.name}</p>
+          <p class="mt-2 text-sm leading-6 text-zinc-600">
+            ${truncateDescription(post.description, 150)}
+          </p>
         </a>
       </li>
     `;

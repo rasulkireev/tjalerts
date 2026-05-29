@@ -30,7 +30,7 @@ export default class extends Controller {
     const query = this.searchTarget.value;
     if (query.length < 2) {
       this.searchResultsTarget.innerHTML = '';
-      this.searchResultsTarget.classList.remove('border', 'border-gray-200');
+      this.searchResultsTarget.classList.remove('border', 'border-zinc-200');
       return;
     }
 
@@ -40,14 +40,14 @@ export default class extends Controller {
     const filteredItems = items.filter(item => !this.selectedItems.has(item.id));
 
     if (filteredItems.length > 0) {
-      this.searchResultsTarget.classList.add('border', 'border-gray-200');
+      this.searchResultsTarget.classList.add('border', 'border-zinc-200');
       this.searchResultsTarget.innerHTML = filteredItems.map(item => `
-        <div class="p-2 cursor-pointer hover:bg-gray-100" data-action="click->search-and-select#addItem" data-id="${item.id}" data-name="${item.name}" data-post-count="${item.post_count || ''}">
+        <div class="cursor-pointer rounded-md p-2 text-sm text-zinc-800 hover:bg-zinc-100" data-action="click->search-and-select#addItem" data-id="${item.id}" data-name="${item.name}" data-post-count="${item.post_count || ''}">
           ${item.name}${item.post_count ? ` (${item.post_count} posts)` : ''}
         </div>
       `).join('');
     } else {
-      this.searchResultsTarget.classList.remove('border', 'border-gray-200');
+      this.searchResultsTarget.classList.remove('border', 'border-zinc-200');
       this.searchResultsTarget.innerHTML = '';
     }
   }
@@ -68,11 +68,12 @@ export default class extends Controller {
     if (!this.selectedItems.has(id)) {
       this.selectedItems.add(id);
       this.selectedResultsTarget.insertAdjacentHTML('beforeend', `
-        <div class="inline-flex items-center px-3 py-1 mr-2 mb-2 text-sm font-semibold text-blue-800 bg-blue-100 rounded-full" data-id="${id}">
+        <div class="tag" data-id="${id}">
           ${name}${postCount ? ` (${postCount} posts)` : ''}
-          <button type="button" class="ml-2 focus:outline-none" data-action="click->search-and-select#removeItem">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          <button type="button" class="ml-2 rounded-sm text-emerald-900 hover:bg-emerald-100" data-action="click->search-and-select#removeItem">
+            <span class="sr-only">Remove ${name}</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
           <input
