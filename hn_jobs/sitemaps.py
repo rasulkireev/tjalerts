@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import sitemaps
 
 # from django.contrib.sitemaps import GenericSitemap
@@ -18,6 +20,10 @@ class StaticViewSitemap(sitemaps.Sitemap):
     def items(self):
         return [
             "home",
+            "support",
+            "privacy",
+            "tos",
+            "uses",
             "companies",
             "technologies",
             "titles",
@@ -42,8 +48,7 @@ class HighestPaidJobsListicleSitemap(sitemaps.Sitemap):
         )
 
     def lastmod(self, obj):
-        print(obj)
-        return obj.post.order_by("-submitted_datetime").first().submitted_datetime
+        return Post.objects.filter(technologies=obj).aggregate(latest_date=Max("submitted_datetime"))["latest_date"]
 
     def location(self, obj):
         return reverse("highest-paid-job-blog-post", kwargs={"slug": obj.slug})
@@ -55,7 +60,7 @@ class CompaniesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("company")
 
         companies_with_recent_posts = (
@@ -79,7 +84,7 @@ class TechnologiesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("technologies")
 
         technologies_with_recent_posts = (
@@ -106,7 +111,7 @@ class TitlesJobsListicleSitemap(sitemaps.Sitemap):
     protocol = "https"
 
     def items(self):
-        two_months_ago = timezone.now() - timezone.timedelta(days=60)
+        two_months_ago = timezone.now() - timedelta(days=60)
         recent_posts = Post.objects.filter(submitted_datetime__gte=two_months_ago).values("titles")
 
         titles_with_recent_posts = (
@@ -141,21 +146,30 @@ class BlogPostSitemap(sitemaps.Sitemap):
         return reverse("blog-post", kwargs={"slug": obj.slug})
 
 
+class RecentPostSitemap(sitemaps.Sitemap):
+    changefreq = "daily"
+    priority = 0.7
+    protocol = "https"
+
+    def items(self):
+        two_months_ago = timezone.now() - timedelta(days=60)
+        return Post.objects.filter(created__gte=two_months_ago).exclude(description="")
+
+    def lastmod(self, obj):
+        return obj.modified
+
+    def location(self, obj):
+        return obj.get_absolute_url()
+
+
 sitemaps = {
     "sitemaps": {
         "static": StaticViewSitemap,
         "blog-posts": BlogPostSitemap,
-        # "highest_paid_jobs_listicle": HighestPaidJobsListicleSitemap,
-        # "company_jobs": CompaniesJobsListicleSitemap,
-        # "technology_jobs": TechnologiesJobsListicleSitemap,
-        # "title_jobs": TitlesJobsListicleSitemap,
-        # "posts": GenericSitemap(
-        #     {
-        #         "queryset": Post.objects.filter(created__gte=timezone.now() - timezone.timedelta(days=60)),
-        #         "date_field": "modified",
-        #     },
-        #     priority=0.7,
-        #     protocol="https",
-        # ),
+        "highest_paid_jobs_listicle": HighestPaidJobsListicleSitemap,
+        "company_jobs": CompaniesJobsListicleSitemap,
+        "technology_jobs": TechnologiesJobsListicleSitemap,
+        "title_jobs": TitlesJobsListicleSitemap,
+        "posts": RecentPostSitemap,
     }
 }
