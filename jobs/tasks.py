@@ -21,6 +21,7 @@ from openai import OpenAI
 from hn_jobs.utils import get_tjalerts_logger
 from users.models import CustomUser
 
+from jobs.enrichment import augment_cleaned_job_data_with_context, build_reader_context, extract_first_url
 from jobs.filters import PostFilter
 from jobs.models import Alert, AlertEmailSend, Company, Email, Post, Technology, Title
 from jobs.utils import clean_job_json_object, fix_email, get_embedding, has_number, is_generic
@@ -155,6 +156,34 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
         raise e
 
     cleaned_data = clean_job_json_object(json_job, json_converted_comment_response)
+    company_homepage_link = extract_first_url(cleaned_data["company_homepage_link"])
+    job_application_link = extract_first_url(cleaned_data["company_job_application_link"])
+
+    if company_homepage_link:
+        cleaned_data["company_homepage_link"] = company_homepage_link
+
+    if job_application_link:
+        cleaned_data["company_job_application_link"] = job_application_link
+
+    company_homepage_context, company_homepage_reader_content = build_reader_context(
+        company_homepage_link,
+        "company_homepage",
+    )
+
+    if job_application_link == company_homepage_link:
+        job_posting_context = {**company_homepage_context, "kind": "job_posting"} if company_homepage_context else {}
+        job_posting_reader_content = company_homepage_reader_content
+    else:
+        job_posting_context, job_posting_reader_content = build_reader_context(
+            job_application_link,
+            "job_posting",
+        )
+
+    cleaned_data = augment_cleaned_job_data_with_context(
+        cleaned_data,
+        job_posting_context,
+        company_homepage_context,
+    )
 
     technology_names = [name.strip() for name in cleaned_data["technologies_used"].split(",")]
     technologies = []
@@ -184,6 +213,10 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
         original_text=cleaned_data["original_text"],
         hn_username=hn_username,
         description=cleaned_data["description"],
+        company_homepage_context=company_homepage_context,
+        company_homepage_reader_content=company_homepage_reader_content,
+        job_posting_context=job_posting_context,
+        job_posting_reader_content=job_posting_reader_content,
         locations=cleaned_data["locations"],
         cities=cleaned_data["cities"],
         countries=cleaned_data["countries"],
