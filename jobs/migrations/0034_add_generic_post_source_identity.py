@@ -32,7 +32,7 @@ def clear_hacker_news_source_identity(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("jobs", "0032_remove_company_emails_index"),
+        ("jobs", "0033_post_page_context"),
     ]
 
     operations = [

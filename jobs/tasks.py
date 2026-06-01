@@ -24,6 +24,7 @@ from hn_jobs.utils import get_tjalerts_logger
 from users.models import CustomUser
 
 from jobs.choices import PostSource
+from jobs.enrichment import augment_cleaned_job_data_with_context, build_reader_context, extract_first_url
 from jobs.filters import PostFilter
 from jobs.models import Alert, AlertEmailSend, Company, Email, Post, Technology, Title
 from jobs.utils import clean_job_json_object, fix_email, get_embedding, has_number, is_generic
@@ -120,6 +121,10 @@ def create_post_from_cleaned_data(
     who_is_hiring_title="",
     who_is_hiring_comment_id=None,
     hn_username="",
+    company_homepage_context=None,
+    company_homepage_reader_content="",
+    job_posting_context=None,
+    job_posting_reader_content="",
 ):
     technology_names = split_comma_separated_values(cleaned_data["technologies_used"])
     technologies = []
@@ -152,6 +157,10 @@ def create_post_from_cleaned_data(
         original_text=cleaned_data["original_text"],
         hn_username=hn_username,
         description=cleaned_data["description"],
+        company_homepage_context=company_homepage_context or {},
+        company_homepage_reader_content=company_homepage_reader_content,
+        job_posting_context=job_posting_context or {},
+        job_posting_reader_content=job_posting_reader_content,
         locations=cleaned_data["locations"],
         cities=cleaned_data["cities"],
         countries=cleaned_data["countries"],
@@ -197,6 +206,54 @@ def merge_company_emails(existing_emails, new_emails):
                 seen.add(email)
 
     return ", ".join(emails)[:MAX_COMPANY_EMAILS_LENGTH]
+
+
+def normalize_cleaned_data_urls(cleaned_data):
+    company_homepage_link = extract_first_url(cleaned_data["company_homepage_link"])
+    job_application_link = extract_first_url(cleaned_data["company_job_application_link"])
+
+    if company_homepage_link:
+        cleaned_data["company_homepage_link"] = company_homepage_link
+
+    if job_application_link:
+        cleaned_data["company_job_application_link"] = job_application_link
+
+    return company_homepage_link, job_application_link
+
+
+def enrich_cleaned_data_with_reader_context(cleaned_data):
+    company_homepage_link, job_application_link = normalize_cleaned_data_urls(cleaned_data)
+
+    company_homepage_context, company_homepage_reader_content = build_reader_context(
+        company_homepage_link,
+        "company_homepage",
+    )
+
+    if not job_application_link:
+        job_posting_context = {}
+        job_posting_reader_content = ""
+    elif job_application_link == company_homepage_link:
+        job_posting_context = {**company_homepage_context, "kind": "job_posting"} if company_homepage_context else {}
+        job_posting_reader_content = company_homepage_reader_content
+    else:
+        job_posting_context, job_posting_reader_content = build_reader_context(
+            job_application_link,
+            "job_posting",
+        )
+
+    cleaned_data = augment_cleaned_job_data_with_context(
+        cleaned_data,
+        job_posting_context,
+        company_homepage_context,
+    )
+
+    return (
+        cleaned_data,
+        company_homepage_context,
+        company_homepage_reader_content,
+        job_posting_context,
+        job_posting_reader_content,
+    )
 
 
 def get_hn_pages_to_analyze(who_is_hiring_post_id):
@@ -256,6 +313,14 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
     vector = get_embedding(json_job["text"])
 
     cleaned_data = clean_job_json_object(json_job, extract_job_data_from_text(json_job["text"]))
+    (
+        cleaned_data,
+        company_homepage_context,
+        company_homepage_reader_content,
+        job_posting_context,
+        job_posting_reader_content,
+    ) = enrich_cleaned_data_with_reader_context(cleaned_data)
+
     create_post_from_cleaned_data(
         cleaned_data,
         source=PostSource.HACKER_NEWS,
@@ -267,6 +332,10 @@ def analyze_hn_page(who_is_hiring_id, who_is_hiring_title, comment_id):
         who_is_hiring_comment_id=who_is_hiring_comment_id,
         hn_username=hn_username,
         submitted_datetime=datetime.fromtimestamp(unix_timestamp, tz=dt_timezone.utc),
+        company_homepage_context=company_homepage_context,
+        company_homepage_reader_content=company_homepage_reader_content,
+        job_posting_context=job_posting_context,
+        job_posting_reader_content=job_posting_reader_content,
         vector=vector,
     )
 
