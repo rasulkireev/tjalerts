@@ -4,6 +4,10 @@ from django.db import migrations, models
 
 
 def backfill_hacker_news_source_identity(apps, schema_editor):
+    # Keep future production-scale backfills out of migrations. This app runs
+    # migrations before Gunicorn starts, so long RunPython work can leave the
+    # site returning 502s. Use a batched management command or worker job for
+    # large rewrites; see docs/production-data-changes.md.
     Post = apps.get_model("jobs", "Post")
 
     posts_to_update = []
