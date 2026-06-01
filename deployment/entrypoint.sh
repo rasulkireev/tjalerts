@@ -39,6 +39,10 @@ if [ "$server" = true ]; then
         python manage.py migrate
     else
         echo "Skipping startup migrations because RUN_MIGRATIONS_ON_STARTUP=$RUN_MIGRATIONS_ON_STARTUP"
+        python manage.py migrate --check || {
+            echo "ERROR: Pending migrations detected. Run migrations before starting the server." >&2
+            exit 1
+        }
     fi
     # python manage.py djstripe_sync_models
     gunicorn ${PROJECT_NAME}.wsgi:application --bind 0.0.0.0:80 --workers 3 --threads 2 --reload

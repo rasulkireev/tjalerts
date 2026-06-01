@@ -21,4 +21,5 @@ Prefer this flow for production-scale data changes:
 Use `RUN_MIGRATIONS_ON_STARTUP=false` only when migrations are being run by a
 separate release step or manually before the web process starts. Do not disable
 startup migrations without a replacement path, or new code may boot against an
-old schema.
+old schema. The entrypoint still runs `python manage.py migrate --check` in this
+mode so the web process fails fast if unapplied migrations remain.
